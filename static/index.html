@@ -1,0 +1,1236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STARK HOST — Deploy like a genius</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2312070a' stroke='%23ffc83d' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%237df3ff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09060a;--card:rgba(255,255,255,.045);--bd:rgba(255,200,61,.16);--tx:#f6eef0;--mut:#a89aa0;--a:#e11d2e;--b:#ffc83d;--ok:#34e8a1;--bad:#ff5468;--warn:#ffc83d}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.35;z-index:0;pointer-events:none}
+.o1{width:420px;height:420px;background:var(--a);top:-120px;left:-100px}
+.o2{width:380px;height:380px;background:var(--b);bottom:-140px;right:-100px}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:22px 16px 70px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.brand span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:9px 14px;border-radius:12px;transition:.2s}
+button:hover{border-color:rgba(255,255,255,.3)}
+.pri{background:linear-gradient(135deg,var(--a),var(--b));border:0;font-weight:700;color:#fff}
+.dng:hover{border-color:var(--bad);color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px}
+.stat b{display:block;font-size:30px;font-weight:800}.stat small{color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.name{font-size:18px;font-weight:700;word-break:break-all}
+.badge{font-size:12px;color:var(--mut);margin-top:4px}
+.pill{font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid var(--bd);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+.pill.on{color:var(--ok);border-color:rgba(46,229,157,.4)}.pill.on .dot{background:var(--ok)}
+.pill.wait{color:var(--warn);border-color:rgba(255,200,87,.4)}.pill.wait .dot{background:var(--warn)}
+.url{display:block;margin:10px 0 2px;font-size:13px;color:var(--b);text-decoration:none;word-break:break-all}
+.url.s{color:var(--mut);margin:0 0 10px;font-size:12px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}.acts button{padding:7px 11px;font-size:13px}
+.drop{display:block;margin-top:12px;border:1.5px dashed var(--bd);border-radius:14px;padding:12px;text-align:center;font-size:13px;color:var(--mut);cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--a);color:var(--tx)}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:50px 10px;border:1px dashed var(--bd);border-radius:20px}
+.ov{position:fixed;inset:0;z-index:20;background:rgba(7,11,20,.88);display:flex;align-items:center;justify-content:center;padding:12px}
+.ov.hide{display:none}
+.box{width:100%;max-width:440px;max-height:94vh;overflow:auto;background:#0e1424;border:1px solid var(--bd);border-radius:22px;padding:22px}
+.box.wide{max-width:820px}.box h2{margin-bottom:12px;word-break:break-all}
+label.f{display:block;font-size:13px;color:var(--mut);margin:12px 0 6px}
+input,select,textarea{width:100%;font:inherit;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;outline:none}
+textarea{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--a)}
+select option{background:#0e1424}
+.err{color:var(--bad);font-size:13px;margin-top:8px;min-height:16px}
+.hint{font-size:12px;color:var(--mut);margin-top:6px;line-height:1.5}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{padding:7px 12px;font-size:13px}.tabs button.on{border-color:var(--a);background:rgba(124,92,255,.18)}
+.sec{display:none}.sec.on{display:block}
+pre{background:#05080f;border:1px solid var(--bd);border-radius:14px;padding:10px;height:52vh;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-all;margin-bottom:10px}
+pre div.err{color:#ff8da1;background:rgba(255,92,124,.1);margin:0;min-height:0;font-size:12px}
+.banner{font-size:13px;padding:9px 12px;border-radius:12px;margin-bottom:10px;border:1px solid var(--bd)}
+.banner.good{color:var(--ok);border-color:rgba(46,229,157,.4)}.banner.bad{color:#ffb3c0;border-color:var(--bad);background:rgba(255,92,124,.08)}
+.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--mut)}.chk input{width:auto}
+.fgrid{display:grid;grid-template-columns:230px 1fr;gap:10px}
+.flist{border:1px solid var(--bd);border-radius:12px;height:56vh;overflow:auto;font-size:13px}
+.flist div{padding:5px 10px;cursor:pointer;white-space:nowrap}.flist div:hover{background:rgba(255,255,255,.06)}.flist div.sel{background:rgba(124,92,255,.25)}.flist div.d{color:var(--mut);cursor:default}
+#fText{height:48vh;white-space:pre;overflow:auto}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--bd);border-radius:12px;margin-top:8px;font-size:13px;word-break:break-all}
+details{margin-top:14px;border:1px solid var(--bd);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.6}summary{cursor:pointer;font-weight:600}
+code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:6px;font-size:12px}
+#upbar{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:60;width:min(420px,92vw);background:#0e1424;border:1px solid var(--bd);border-radius:16px;padding:14px 16px;display:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#upbar.show{display:block}
+#upbar .r{display:flex;justify-content:space-between;gap:10px;font-size:13px}#upbar .r span:first-child{word-break:break-all}
+.upk{height:8px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-top:10px}
+.upk i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b),var(--a));background-size:200% 100%;animation:upflow 1s linear infinite;transition:width .2s}
+.upk.ind i{width:40%!important;animation:upflow 1s linear infinite,upslide 1.1s ease-in-out infinite alternate}
+@keyframes upflow{to{background-position:-200% 0}}@keyframes upslide{from{margin-left:0}to{margin-left:60%}}
+.brandbox{display:flex;align-items:center;gap:12px}
+.logo{flex:none;filter:drop-shadow(0 6px 18px rgba(124,92,255,.55))}
+.brand2{font-size:25px;font-weight:800;letter-spacing:-.6px;line-height:1.05}
+.brand2 span{background:linear-gradient(90deg,var(--a),var(--b),var(--a));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:bflow 4s linear infinite}
+@keyframes bflow{to{background-position:-200% 0}}
+.tag{font-size:10.5px;color:var(--mut);letter-spacing:2.2px;text-transform:uppercase;margin-top:3px}
+.foot{margin-top:42px;text-align:center;padding:24px 14px;border:1px solid var(--bd);border-radius:22px;background:var(--card)}
+.foot .dev{font-size:15px;color:var(--tx)}.foot .dev b{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.foot .dev em{font-style:normal;display:inline-block;animation:beat 1.4s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.tg{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:10px 20px;border-radius:99px;background:linear-gradient(135deg,#2aabee,#229ed9);color:#fff;text-decoration:none;font-weight:700;font-size:14px;transition:.2s}
+.tg:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(42,171,238,.4)}
+.lgdev{text-align:center;font-size:12px;color:var(--mut);margin-top:16px}.lgdev a{color:#2aabee;text-decoration:none}
+.flist div[data-dir]{cursor:pointer}.flist div[data-dir]:hover{background:rgba(255,255,255,.06)}
+#fDrop{margin:0 0 10px;padding:10px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;z-index:50;background:#161d33;border:1px solid var(--bd);padding:11px 18px;border-radius:14px;transition:.3s;pointer-events:none;max-width:90vw}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{border-color:var(--bad);color:var(--bad)}
+@media(max-width:640px){.fgrid{grid-template-columns:1fr}.flist{height:20vh}#fText{height:38vh}.stat b{font-size:24px}}
+
+.hide{display:none!important}
+body{background:radial-gradient(1200px 600px at 80% -10%,rgba(225,29,46,.18),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(255,200,61,.10),transparent 60%),var(--bg)}
+.card{position:relative}
+.card::before,.card::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;opacity:.9}
+.card::before{top:-1px;left:-1px;border-top:2px solid var(--b);border-left:2px solid var(--b);border-top-left-radius:6px}
+.card::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--a);border-right:2px solid var(--a);border-bottom-right-radius:6px}
+.mut{color:var(--mut);font-size:13px}
+.reactor{filter:drop-shadow(0 0 10px rgba(125,243,255,.55));flex:none}
+.reactor .rr{transform-origin:32px 32px;animation:rspin 14s linear infinite}
+.reactor .core{animation:rpulse 2.2s ease-in-out infinite}
+@keyframes rspin{to{transform:rotate(360deg)}}@keyframes rpulse{50%{opacity:.6}}
+.bname{font-weight:900;letter-spacing:3px;font-size:19px;text-transform:uppercase;line-height:1}
+.bname span{background:linear-gradient(90deg,#ffc83d,#e11d2e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bsub{font-size:9.5px;letter-spacing:3px;color:var(--mut);margin-top:4px;text-transform:uppercase}
+/* landing */
+.land{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:18px 18px 40px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center;margin:30px 0 50px}
+.hero h1{font-size:clamp(32px,6vw,58px);line-height:1.02;letter-spacing:-1.5px;font-weight:900}
+.hero h1 span{background:linear-gradient(90deg,#ffc83d,#ff5a36,#e11d2e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mut);margin:16px 0 22px;line-height:1.6;font-size:16px;max-width:520px}
+.hero .big{display:flex;justify-content:center}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:46px}
+.feat{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:18px}.feat b{display:block;margin:6px 0 4px}.feat span{color:var(--mut);font-size:13px;line-height:1.5}
+.sech{font-size:12px;letter-spacing:4px;color:var(--b);text-transform:uppercase;margin:6px 0 14px;font-weight:700}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:30px}
+.plan{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;position:relative}
+.plan.hot{border-color:var(--a);box-shadow:0 0 30px rgba(225,29,46,.25)}
+.plan h3{font-size:18px}.plan .price{font-size:30px;font-weight:900;margin:8px 0}.plan .price small{font-size:13px;color:var(--mut);font-weight:400}
+.plan ul{list-style:none;padding:0;margin:10px 0 14px;font-size:13.5px;line-height:2}.plan li::before{content:"◆ ";color:var(--b);font-size:10px}
+.plan .cur{position:absolute;top:12px;right:12px;font-size:11px;color:var(--ok);border:1px solid var(--ok);border-radius:99px;padding:2px 9px}
+/* auth */
+.alinks{display:flex;justify-content:space-between;margin-top:14px;font-size:13px}.alinks a{color:var(--b);cursor:pointer}
+.otp{letter-spacing:10px;font-size:24px;text-align:center;font-weight:800}
+/* app shell */
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+.side{width:250px;position:fixed;top:0;bottom:0;left:0;background:linear-gradient(180deg,#18090d,#0b0608);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:16px 12px;overflow:auto;z-index:30;transition:transform .25s}
+.side .brandrow{display:flex;gap:10px;align-items:center;padding:4px 6px 14px;border-bottom:1px solid var(--bd);margin-bottom:10px}
+.side a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;color:var(--tx);text-decoration:none;font-size:14px;margin-bottom:3px;border:1px solid transparent;cursor:pointer}
+.side a:hover{background:rgba(255,200,61,.07)}
+.side a.on{background:linear-gradient(90deg,rgba(225,29,46,.3),rgba(255,200,61,.07));border-color:rgba(255,200,61,.3)}
+.side .grp{font-size:10px;letter-spacing:2.5px;color:var(--mut);margin:16px 10px 6px;text-transform:uppercase}
+.side .sp{flex:1;min-height:14px}
+.side .sup{background:linear-gradient(135deg,rgba(42,171,238,.25),rgba(34,158,217,.1));border:1px solid rgba(42,171,238,.4)}
+.side .dev{font-size:11.5px;color:var(--mut);text-align:center;padding:12px 6px 4px;line-height:1.6}
+.side .dev a{display:inline-flex;justify-content:center;padding:6px 12px;margin:6px 0 0;color:#fff;background:linear-gradient(135deg,#2aabee,#229ed9);border-radius:99px;font-size:12px;font-weight:700}
+.main{margin-left:250px;flex:1;min-width:0;padding:18px 24px 60px}
+.tbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
+.tbar h1{font-size:22px;letter-spacing:.5px}
+#burger{display:none;padding:8px 12px}
+.chip{font-size:12px;border:1px solid var(--bd);border-radius:99px;padding:5px 12px;color:var(--b)}
+.planbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:20px;margin-bottom:16px;background:linear-gradient(120deg,rgba(225,29,46,.18),rgba(255,200,61,.06))}
+.planname{font-size:26px;font-weight:900;margin:4px 0}
+.tagp{font-size:11px;letter-spacing:1.5px;color:#0a0506;background:linear-gradient(90deg,#ffc83d,#ff9f1c);padding:3px 10px;border-radius:99px;vertical-align:middle;font-weight:800}
+.rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:16px}
+.ringbox{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;text-align:center;position:relative}
+.ringbox small{display:block;color:var(--mut);margin-top:4px;font-size:12px}
+.stats3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:16px}
+.sbox{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px}.sbox b{display:block;font-size:30px}.sbox small{color:var(--mut)}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px;margin-bottom:16px;position:relative}
+.panel h3{margin-bottom:10px;font-size:15px;letter-spacing:.5px}
+.tscroll{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th{text-align:left;color:var(--mut);font-weight:600;padding:8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.tbl td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle;word-break:break-word}
+.tbl button{padding:5px 9px;font-size:12px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.st{font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid var(--bd)}.st.ok{color:var(--ok);border-color:rgba(52,232,161,.4)}.st.bad{color:var(--bad);border-color:rgba(255,84,104,.4)}.st.wt{color:var(--warn);border-color:rgba(255,200,61,.4)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.pgrid .plan .acts button{width:100%;margin-bottom:6px;padding:10px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.hero .big{order:-1}.two{grid-template-columns:1fr}}
+@media(max-width:860px){.side{transform:translateX(-102%)}.side.open{transform:none;box-shadow:0 0 60px #000}.main{margin-left:0;padding:14px}#burger{display:inline-flex}}
+
+body{font-family:'Rajdhani','Segoe UI',system-ui,sans-serif;font-size:17px;font-weight:500}
+h1,h2,h3,.bname,.bigname,.planname,.price,.tbar h1,.sech,.tagp,.cur{font-family:'Orbitron','Rajdhani',sans-serif}
+button,input,select,textarea{font-family:inherit}
+button{font-weight:700;letter-spacing:.3px}
+.hero h1{font-size:clamp(26px,5vw,46px);letter-spacing:0;line-height:1.1}
+.price{font-size:28px}.planname{font-size:24px}.tbar h1{font-size:19px;letter-spacing:1px}
+.bname{font-size:17px;letter-spacing:3px}.bname span{background:linear-gradient(90deg,#ffc83d,#e11d2e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav2{display:flex;flex-direction:column;align-items:center;gap:18px;margin:6px 0 40px;text-align:center}
+.brandhero{display:flex;flex-direction:column;align-items:center;gap:8px}
+.brandhero .bsub{font-size:12px;letter-spacing:5px}
+svg.i{width:1.15em;height:1.15em;flex:none}
+.ic{display:inline-flex;vertical-align:-.2em;line-height:1}
+.ic-heart,.ic-heartbreak{color:#ff3b30}
+button svg.i,.chip svg.i,a svg.i{margin-right:2px}
+.iconbtn{padding:8px 11px;display:inline-flex;align-items:center;justify-content:center}
+.pw{position:relative;display:block}.pw input{padding-right:46px}
+.pw .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:0;padding:8px 10px;color:var(--mut)}
+.pw .eye:hover{color:var(--b)}
+.mback{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;margin:-4px 0 10px -4px;font-size:14px;color:var(--b);border-color:rgba(255,200,61,.3)}
+.sidebg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:25}
+@media(max-width:860px){.side.open~.sidebg{display:block}}
+.warnbar{display:flex;gap:12px;align-items:center;padding:13px 16px;border-radius:14px;margin-bottom:14px;border:1px solid var(--warn);background:rgba(255,200,61,.09);font-size:15px}
+.warnbar.full{border-color:var(--bad);background:rgba(255,84,104,.13)}
+.warnbar svg.i{width:1.5em;height:1.5em;color:var(--warn)}.warnbar.full svg.i{color:var(--bad)}
+.warnbar a{color:var(--b);text-decoration:underline;cursor:pointer}
+.side a svg.i{width:1.25em;height:1.25em;margin-right:0}
+
+.dlgic{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 12px;background:rgba(255,200,61,.12);color:var(--b);border:1px solid rgba(255,200,61,.3)}
+.dlgic.bad{background:rgba(255,84,104,.13);color:var(--bad);border-color:rgba(255,84,104,.4)}.dlgic svg.i{width:28px;height:28px;margin:0}
+.dlgt{text-align:center;font-size:18px}.dlgm{text-align:center;color:var(--mut);margin:8px 0 18px;line-height:1.5;word-break:break-word}
+.dlgb{justify-content:center}.dlgb button{min-width:120px;padding:11px 16px}
+.dngf{background:linear-gradient(135deg,#b3121f,#e11d2e);border:0;color:#fff;box-shadow:0 6px 20px rgba(225,29,46,.35)}
+#mDlg{z-index:45}#mDlg .box{max-width:380px;animation:pop .18s ease-out}@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.live{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 4px}
+.live>div{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:14px;padding:10px 12px}
+.live span{font-size:11px;letter-spacing:2px;color:var(--mut)}.live b{display:block;font-size:22px;font-family:'Orbitron','Rajdhani',sans-serif;margin:2px 0}.live small{color:var(--mut);font-size:12px}
+.mini{height:6px;background:rgba(255,255,255,.08);border-radius:9px;margin-top:7px;overflow:hidden}.mini i{display:block;height:100%;border-radius:9px;transition:width .6s}
+.mini i.g{background:var(--ok)}.mini i.y{background:var(--warn)}.mini i.r{background:var(--bad)}
+
+/* ===== STARK HOST — power brand ===== */
+.nav2{width:100%;gap:12px;margin:4px 0 34px}
+.brandhero{position:relative;width:100%;gap:12px}
+.bigname{display:inline-block;white-space:nowrap;max-width:100%;font-weight:900;font-size:clamp(24px,8.6vw,84px);letter-spacing:.07em;line-height:1.05;text-transform:uppercase;color:#fff;text-align:center;animation:namePulse 2.6s ease-in-out infinite}
+.bigname .ch{display:inline-block;opacity:0;animation:chIn .75s cubic-bezier(.2,.9,.25,1.15) forwards;animation-delay:calc(var(--i)*75ms)}
+.bigname .sp{display:inline-block;width:.34em}
+.bigname .w1{display:inline-block;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.35)}
+.bigname .w2{display:inline-block;color:#ffb02e;text-shadow:0 0 22px rgba(255,90,54,.6)}
+.bigname.on .w1{background:linear-gradient(100deg,#fff 0 38%,#ffe08a 48%,#7df3ff 52%,#fff 62% 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;animation:sweep 3.4s linear infinite}
+.bigname.on .w2{background:linear-gradient(90deg,#ffc83d,#ff5a36,#e11d2e,#ff5a36,#ffc83d);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;animation:bflow 2.4s linear infinite,flick 7s steps(1) infinite}
+@keyframes chIn{0%{opacity:0;transform:translateY(-.7em) scale(1.9);filter:blur(12px) brightness(3)}55%{opacity:1;filter:blur(0) brightness(2.4)}100%{opacity:1;transform:none;filter:none}}
+@keyframes sweep{to{background-position:-260% 0}}
+@keyframes namePulse{0%,100%{filter:drop-shadow(0 0 12px rgba(225,29,46,.5))}50%{filter:drop-shadow(0 0 30px rgba(255,200,61,.75))}}
+@keyframes flick{0%,89%,93%,100%{opacity:1}90%,94%{opacity:.35}91%{opacity:.95}92%{opacity:.55}}
+.beam{width:min(84%,520px);height:3px;border-radius:3px;margin-top:-2px;background:linear-gradient(90deg,transparent,#e11d2e,#ffc83d,#7df3ff,#ffc83d,#e11d2e,transparent);background-size:200% 100%;filter:drop-shadow(0 0 8px rgba(255,200,61,.9));animation:beamIn 1s ease-out 1.1s both,upflow 2.2s linear 2s infinite}
+@keyframes beamIn{from{transform:scaleX(0);opacity:0}to{transform:none;opacity:1}}
+.brandhero .bsub{animation:subIn 1s ease-out 1.5s both}
+@keyframes subIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* reactor: shock-wave rings + surge */
+#navLogo,#heroReactor{position:relative;display:inline-flex}
+#heroReactor{width:230px;height:230px;margin:0 auto}
+#navLogo::before,#navLogo::after,#heroReactor::before,#heroReactor::after{content:"";position:absolute;inset:6%;border-radius:50%;border:2px solid rgba(125,243,255,.75);pointer-events:none;animation:shock 2.8s ease-out infinite}
+#navLogo::after,#heroReactor::after{border-color:rgba(255,200,61,.65);animation-delay:1.4s}
+@keyframes shock{0%{transform:scale(.9);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.reactor{animation:rsurge 3s ease-in-out infinite}
+.reactor .rr{animation-duration:8s}
+.reactor.od .rr{animation-duration:1s}.reactor.od{animation-duration:.5s}
+@keyframes rsurge{0%,100%{filter:drop-shadow(0 0 10px rgba(125,243,255,.6))}50%{filter:drop-shadow(0 0 26px rgba(255,200,61,.95)) brightness(1.2)}}
+/* power surge flash behind the page */
+#landing::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 50% 16%,rgba(125,243,255,.2),transparent 55%);opacity:0;animation:zap 7s infinite}
+@keyframes zap{0%,93%,100%{opacity:0}94%{opacity:1}95%{opacity:.15}96%{opacity:.9}98%{opacity:0}}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+/* energy on landing text + buttons + cards */
+.hero h1 span{background-size:200% 100%;background-image:linear-gradient(90deg,#ffc83d,#ff5a36,#e11d2e,#ff5a36,#ffc83d);animation:bflow 2.6s linear infinite}
+.land button.pri{position:relative;overflow:hidden;animation:ring 2.4s infinite}
+.land button.pri::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,90,54,.55)}70%,100%{box-shadow:0 0 0 16px rgba(255,90,54,0)}}
+@keyframes shine{0%,55%{left:-60%}100%{left:130%}}
+.rv{opacity:0;transform:translateY(30px) scale(.96);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.9,.25,1.1),box-shadow .3s,border-color .3s;transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none}
+.feat.rv.in:hover,.plan.rv.in:hover{transform:translateY(-6px);border-color:var(--b);box-shadow:0 14px 40px rgba(225,29,46,.3);transition-delay:0ms}
+.feat.rv.in::before{content:"";position:absolute}
+.feat{position:relative;overflow:hidden}
+.feat.in::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,200,61,.14),transparent);transform:skewX(-18deg);animation:shine 5s ease-in-out infinite;animation-delay:var(--d,0ms)}
+@media(prefers-reduced-motion:reduce){.bigname,.bigname .ch,.beam,.reactor,.reactor .rr,#landing::before,.hero h1 span,.land button.pri,.land button.pri::after,.feat.in::after,#navLogo::before,#navLogo::after,#heroReactor::before,#heroReactor::after{animation:none!important}.bigname .ch{opacity:1}.rv{opacity:1;transform:none}}
+
+/* ===== LITE / MOBILE MODE: smaller STARK HOST, no background orbs/sparks; logo animations stay ON ===== */
+#landing::before{display:none!important;animation:none!important}
+.feat.in::after,.land button.pri::after{animation:none!important;display:none!important}
+.land button.pri{animation:none!important}
+@media(max-width:860px),(pointer:coarse){
+  .orb,#fx{display:none!important}
+  .bigname{font-size:clamp(18px,6.2vw,40px);letter-spacing:.05em}
+  #heroReactor{width:170px;height:170px}
+  #heroReactor svg{width:170px!important;height:170px!important}
+  #navLogo svg{width:64px!important;height:64px!important}
+  .brand2 span,.hero h1 span,.upk i{animation:none!important}
+  .rv{transition:opacity .3s ease,transform .3s ease!important}
+  .plan.hot{box-shadow:none}
+  *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas><div class="orb o1"></div><div class="orb o2"></div>
+<!-- LANDING -->
+<div id="landing" class="land hide">
+  <div class="nav2">
+    <div class="brandhero"><span id="navLogo"></span><div class="bigname">STARK&nbsp;HOST</div><div class="beam"></div><div class="bsub">Arc-reactor powered hosting</div></div>
+    <div class="row" style="justify-content:center"><button onclick="openAuth('login')">Log in</button><button class="pri" onclick="openAuth('signup')">Sign up free</button></div>
+  </div>
+  <div class="hero">
+    <div>
+      <div class="chip" style="display:inline-block;margin-bottom:14px">⚡ GENIUS-GRADE INFRASTRUCTURE</div>
+      <h1>Deploy like a <span>genius.</span><br>Scale like a billionaire.</h1>
+      <p>Upload a ZIP or paste a GitHub link — Stark Host detects your language, builds it, gives you a live URL, HTTPS, logs and databases. Node, Python, Go, PHP, Java, Rust, .NET and more.</p>
+      <div class="row"><button class="pri" onclick="openAuth('signup')">🚀 Start free</button><a class="chip" href="#plansec" style="text-decoration:none">See plans ↓</a></div>
+    </div>
+    <div class="big" id="heroReactor"></div>
+  </div>
+  <div class="feats">
+    <div class="feat">🧠<b>Auto language detect</b><span>No config. Drop code, we figure out the rest.</span></div>
+    <div class="feat">🔗<b>GitHub auto-deploy</b><span>Push to GitHub and your app redeploys itself.</span></div>
+    <div class="feat">🌐<b>Free domains + HTTPS</b><span>Instant domain for every app. Bring your own on paid plans.</span></div>
+    <div class="feat">🗄<b>Databases built-in</b><span>MongoDB, PostgreSQL, MySQL — or connect your own, Redis included.</span></div>
+    <div class="feat">📜<b>Live logs &amp; file editor</b><span>Errors highlighted with fixes. Edit code right in the browser.</span></div>
+    <div class="feat">🛡<b>Isolated &amp; limited</b><span>Every app runs in its own sandbox with RAM / CPU / SSD limits.</span></div>
+  </div>
+  <div class="sech" id="plansec">Choose your suit</div>
+  <div class="pgrid" id="landPlans"></div>
+  <footer class="foot">
+    <div class="dev"><em>❤️</em> Developer By <b>Junaid-Niz</b> <em>💔</em></div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <a class="tg" href="https://t.me/junaidaliniz" target="_blank" rel="noopener noreferrer">✈ Telegram Channel</a>
+      <a class="tg" href="https://t.me/junaidaliniz" target="_blank" rel="noopener noreferrer">💬 Stark Host Support Channel</a>
+    </div>
+  </footer>
+</div>
+
+<input type="file" id="projUp" hidden>
+<!-- AUTH -->
+<div id="mAuth" class="ov hide"><div class="box" style="position:relative">
+  <div class="row" style="justify-content:center;margin-bottom:10px"><span id="authLogo"></span></div>
+  <div id="authBody"></div>
+  <button style="position:absolute;top:10px;right:10px;padding:4px 10px" onclick="closeM('mAuth')">✕</button>
+</div></div>
+
+<!-- APP -->
+<div id="app" class="app hide">
+  <aside class="side" id="side"></aside><div class="sidebg" id="sideBg"></div>
+  <main class="main">
+    <div class="tbar"><div class="row"><button id="burger" class="iconbtn" onclick="$('#side').classList.toggle('open')">☰</button><button id="backBtn" class="iconbtn hide" onclick="goBack()" title="Back">←</button><h1 id="ptitle">Dashboard</h1></div><div class="row"><span class="chip" id="meChip"></span></div></div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<!-- NEW PROJECT -->
+<div id="mNew" class="ov hide"><div class="box">
+  <h2>New project</h2>
+  <label class="f">Name (also your free subdomain)</label><input id="nName" placeholder="my-app">
+  <label class="f">Language</label>
+  <select id="nRt"></select>
+  <div class="hint">“Auto-detect” works for every language: Node, Python, Go, PHP, Ruby, Java, Rust, .NET, Deno, HTML, or any Dockerfile.</div>
+  <label class="f">GitHub / Git link (optional)</label><input id="nRepo" placeholder="https://github.com/user/repo">
+  <div class="row" style="margin-top:8px"><input id="nBranch" placeholder="branch (optional)" style="flex:1"><input id="nToken" type="password" placeholder="token (private repo)" style="flex:1"></div>
+  <div class="hint">Leave the link empty to upload a ZIP / files after creating the project.</div>
+  <label class="f">Start command (optional)</label><input id="nCmd" placeholder="leave empty = automatic">
+  <div class="hint">Web apps must listen on <code>0.0.0.0</code> and the <code>PORT</code> env variable.</div>
+  <div class="err" id="nerr"></div>
+  <div class="row"><button class="pri" onclick="createProject()">Create</button><button onclick="closeM('mNew')">Cancel</button></div>
+</div></div>
+
+<!-- PROJECT SETTINGS -->
+<div id="mProj" class="ov hide"><div class="box wide">
+  <h2 id="pTitle">Project</h2>
+  <div class="tabs" id="pTabs">
+    <button data-t="gen" class="on">General & Git</button><button data-t="vars">Variables & Databases</button><button data-t="res">Resources</button><button data-t="dom">Domains</button>
+  </div>
+  <div class="sec on" id="s-gen">
+    <label class="f">Language</label><select id="pRt"></select>
+    <div class="hint" id="pDet"></div>
+    <label class="f">Start command (empty = automatic)</label><input id="pCmd">
+    <label class="f">GitHub / Git link</label><input id="pRepo" placeholder="https://github.com/user/repo">
+    <div class="row" style="margin-top:8px"><input id="pBranch" placeholder="branch" style="flex:1"><input id="pToken" type="password" placeholder="token" style="flex:1"></div>
+    <div id="pHookBox" style="display:none"><label class="f">Auto-deploy webhook (GitHub → Settings → Webhooks → Payload URL)</label><input id="pHook" readonly onclick="this.select()"></div>
+    <div class="err" id="gErr"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="pri" onclick="saveCfg(true)">Save & redeploy</button><button onclick="saveCfg(false)">Save</button>
+      <button id="pPull" onclick="pull()">⬇ Pull latest from Git</button>
+    </div>
+  </div>
+  <div class="sec" id="s-vars">
+    <label class="f">⚡ Add a database to this project (one click)</label>
+    <div class="row"><button class="pri" onclick="quickDb('mongo')">🍃 MongoDB</button><button class="pri" onclick="quickDb('postgres')">🐘 PostgreSQL</button><button class="pri" onclick="quickDb('mysql')">🐬 MySQL</button></div>
+    <div class="hint">Creates a private database for you and attaches its connection string automatically. Then press “Save & restart”.</div>
+    <label class="f">Or attach one of your existing databases</label>
+    <div class="row"><select id="pDb" style="flex:1"></select><button onclick="attach('attach')">Attach</button><button onclick="attach('detach')">Detach</button></div>
+    <div class="hint">Adds the connection string as env variables (<code>MONGODB_URI</code>, <code>DATABASE_URL</code>, <code>MYSQL_URL</code>, <code>REDIS_URL</code>). Create or connect databases in the <b>Databases</b> page.</div>
+    <label class="f">Environment variables (one per line: KEY=value)</label>
+    <textarea id="pEnv" rows="8" spellcheck="false" placeholder="API_KEY=abc123&#10;DEBUG=false"></textarea>
+    <div class="err" id="vErr"></div>
+    <div class="row" style="margin-top:10px"><button class="pri" onclick="saveEnv(true)">Save & restart</button><button onclick="saveEnv(false)">Save only</button></div>
+  </div>
+  <div class="sec" id="s-res">
+    <div class="hint" id="rHint"></div>
+    <div class="two"><div><label class="f">RAM (MB)</label><input id="rRam" type="number" min="64" step="64"></div><div><label class="f">CPU (cores)</label><input id="rCpu" type="number" min="0.1" step="0.1"></div></div>
+    <div class="err" id="rErr"></div>
+    <div class="row" style="margin-top:10px"><button class="pri" onclick="saveRes()">Save & restart</button></div>
+  </div>
+  <div class="sec" id="s-dom">
+    <label class="f">Free generated domain</label>
+    <div class="item"><span id="dGen">—</span><span class="row"><button onclick="genDom('')">🎲 Generate new</button><button onclick="chooseDom()">✎ Choose</button></span></div>
+    <div class="hint" id="dGenH"></div>
+    <label class="f">Custom domain <span id="dLock" class="st wt hide">paid plans</span></label>
+    <div class="row"><input id="dNew" placeholder="app.yourdomain.com" style="flex:1"><button class="pri" onclick="addDom()">Add</button></div>
+    <div class="hint" id="dHelp"></div>
+    <div id="dList"></div>
+    <div class="err" id="dErr"></div>
+  </div>
+  <div class="row" style="margin-top:14px"><button onclick="closeM('mProj')">Close</button></div>
+</div></div>
+
+<!-- generic dialog -->
+<div id="mDlg" class="ov hide"><div class="box" id="mDlgBox"></div></div>
+<div id="mGen" class="ov hide"><div class="box" id="mGenBox"></div></div>
+
+<!-- LOGS -->
+<div id="mLogs" class="ov hide"><div class="box wide">
+  <h2 id="lTitle">Logs</h2>
+  <div class="tabs"><button id="tLive" class="on" onclick="logTab('live')">Live logs</button><button id="tDep" onclick="logTab('dep')">Deploy / build</button></div>
+  <div id="lBanner" class="banner good">Waiting for logs…</div>
+  <pre id="lBody"></pre>
+  <div class="row">
+    <label class="chk"><input type="checkbox" id="lErrOnly" onchange="applyFilter()"> errors only</label>
+    <label class="chk"><input type="checkbox" id="lAuto" checked> auto-scroll</label>
+    <button onclick="clearLogs()">Clear</button><button onclick="closeLogs()">Close</button>
+  </div>
+</div></div>
+
+<!-- FILES -->
+<div id="mFiles" class="ov hide"><div class="box wide">
+  <h2 id="fTitle">Files</h2>
+  <div class="row" style="margin-bottom:10px">
+    <button class="pri" onclick="$('#fUp').click()">📤 Upload files / ZIP</button>
+    <button onclick="dlProjZip()">⬇ Project ZIP</button>
+    <button onclick="dlFile()">⬇ This file</button>
+    <button onclick="$('#fUpD').click()">📂 Upload folder</button>
+    <input type="file" id="fUp" multiple hidden onchange="pickFiles(this.files);this.value=''">
+    <input type="file" id="fUpD" webkitdirectory multiple hidden onchange="pickFiles(this.files);this.value=''">
+    <label class="chk"><input type="checkbox" id="fExtract" checked> extract ZIP</label>
+    <label class="chk"><input type="checkbox" id="fAuto" checked> 🚀 auto-deploy on changes</label>
+  </div>
+  <input id="fDir" placeholder="Upload into folder (empty = project root) — or tap a folder on the left" style="margin-bottom:8px">
+  <div class="drop" id="fDrop">⬇ Drop files or a ZIP here</div>
+  <div class="fgrid">
+    <div class="flist" id="fList"></div>
+    <div>
+      <input id="fPath" placeholder="path/to/file.js  (type a new path to create a file)">
+      <textarea id="fText" spellcheck="false" style="margin-top:8px" placeholder="Select a file on the left…"></textarea>
+    </div>
+  </div>
+  <div class="err" id="fErr"></div>
+  <div class="row" style="margin-top:8px">
+    <button class="pri" onclick="saveFile(false)">💾 Save</button><button onclick="saveFile(true)">Save & restart</button>
+    <button onclick="newFile()">＋ New file</button><button class="dng" onclick="delFile()">🗑 Delete</button>
+    <button onclick="dlFile()">⬇ Download file</button><button onclick="dlZip()">⬇ Whole project (ZIP)</button>
+    <button onclick="closeFiles()">Close</button>
+  </div>
+</div></div>
+
+
+<div id="upbar"><div class="r"><span id="upn">file</span><b id="upp">0%</b></div><div class="r" style="color:var(--mut);margin-top:4px"><span id="upt">Uploading…</span></div><div class="upk" id="upk"><i id="upf"></i></div></div>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const RTS={auto:'Auto-detect (any language)',node:'Node.js',python:'Python',go:'Go',php:'PHP',ruby:'Ruby',java:'Java (Maven / jar)',rust:'Rust',dotnet:'.NET',deno:'Deno',static:'HTML / Static',docker:'Dockerfile'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let me=null,projects=[],dbs=[],dbInfo={engines:{}},cur=null,authEmail='';
+const KIND={mongo:'🍃 MongoDB',postgres:'🐘 PostgreSQL',mysql:'🐬 MySQL',redis:'🟥 Redis',other:'🗄 Other'};
+
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',3800)}
+const closeM=id=>$('#'+id).classList.add('hide');
+const openM=id=>$('#'+id).classList.remove('hide');
+const openGen=h=>{$('#mGenBox').innerHTML='<button type="button" class="mback" onclick="closeM(\'mGen\')">← Back</button>'+h;openM('mGen')};
+const fmtMB=m=>m>=1024?(m/1024).toFixed(m%1024?1:0)+' GB':Math.round(m)+' MB';
+const fmtDate=t=>t?new Date(t*1000).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):'—';
+const fmtDT=t=>t?new Date(t*1000).toLocaleString():'—';
+const daysLeft=t=>Math.max(0,Math.ceil((t*1000-Date.now())/864e5));
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('Copied ✓')}catch(e){prompt('Copy:',t)}}
+for(const id of ['nRt','pRt'])$('#'+id).innerHTML=Object.entries(RTS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+
+async function api(path,opt={}){
+  const r=await fetch('/api'+path,{credentials:'same-origin',...opt});
+  const j=(r.headers.get('content-type')||'').includes('json');
+  const d=j?await r.json():await r.text();
+  if(r.status===401&&!path.startsWith('/auth/')&&path!=='/me'){me=null;showLanding()}
+  if(!r.ok)throw new Error((d&&d.error)||'Request failed');
+  return d;
+}
+const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});
+function showLogin(){me=null;showLanding();openAuth('login')}
+
+/* ---------- brand ---------- */
+function reactor(sz){let seg='';for(let i=0;i<10;i++)seg+=`<line x1="32" y1="13" x2="32" y2="19" transform="rotate(${i*36} 32 32)"/>`;
+ return `<svg class="reactor" viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><defs><radialGradient id="ar${sz}"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#7df3ff"/><stop offset="1" stop-color="#0aa5c9" stop-opacity=".25"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="#12070a" stroke="#ffc83d" stroke-width="2.5"/><circle class="rr" cx="32" cy="32" r="24" fill="none" stroke="#e11d2e" stroke-width="2" stroke-dasharray="7 5"/><g stroke="#7df3ff" stroke-width="3" stroke-linecap="round" opacity=".9">${seg}</g><circle class="core" cx="32" cy="32" r="9" fill="url(#ar${sz})"/></svg>`}
+$('#navLogo').innerHTML=reactor(92);$('#heroReactor').innerHTML=reactor(230);$('#authLogo').innerHTML=reactor(64);
+
+/* ---------- landing ---------- */
+const planList=(p,cur2)=>`<ul><li>${fmtMB(p.ram)} RAM</li><li>${p.cpu} CPU core${p.cpu==1?'':'s'}</li><li>${p.disk} GB SSD</li><li>${p.projects} project${p.projects==1?'':'s'}</li><li>${p.dbs} database${p.dbs==1?'':'s'} (MongoDB / SQL)</li><li>${p.custom?'Custom domains + HTTPS':'Free domain'}</li></ul>`;
+async function loadLanding(){
+  try{const d=await api('/plans');
+    $('#landPlans').innerHTML=d.plans.map((p,i)=>`<div class="plan ${i===2?'hot':''}"><h3>${esc(p.name)}</h3><div class="price">${p.price?esc(p.price)+' <small>'+esc(d.currency)+' / month</small>':'Free'}</div>${planList(p)}<button class="${p.price?'pri':''}" style="width:100%" onclick="openAuth('signup')">${p.price?'Get '+esc(p.name):'Start free'}</button></div>`).join('')}catch(e){}
+}
+
+/* ---------- STARK HOST brand: one line, auto-sized, letters power on ---------- */
+const LITE=matchMedia('(max-width:860px)').matches||matchMedia('(pointer:coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
+function fitBrand(){document.querySelectorAll('.bigname').forEach(el=>{
+  const box=el.parentElement;if(!box||!box.clientWidth)return;
+  el.style.fontSize='100px';const w=el.getBoundingClientRect().width||1;
+  el.style.fontSize=Math.max(22,Math.min(LITE?40:96,Math.floor(100*(box.clientWidth-4)/w)))+'px'})}
+function buildBrand(){document.querySelectorAll('.bigname').forEach(el=>{
+  if(el.dataset.built)return;el.dataset.built='1';el.setAttribute('aria-label','STARK HOST');
+  let i=0;const word=(t,c)=>'<span class="'+c+'" aria-hidden="true">'+[...t].map(ch=>'<span class="ch" style="--i:'+(i++)+'">'+ch+'</span>').join('')+'</span>';
+  el.innerHTML=word('STARK','w1')+'<span class="sp"></span>'+word('HOST','w2');fitBrand();
+  setTimeout(()=>{el.classList.add('on');el.innerHTML='<span class="w1" aria-hidden="true">STARK</span><span class="sp"></span><span class="w2" aria-hidden="true">HOST</span>';fitBrand()},1500)})}
+addEventListener('resize',fitBrand);addEventListener('orientationchange',()=>setTimeout(fitBrand,250));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitBrand);
+function initReveal(){
+  const els=[...document.querySelectorAll('#landing .feat:not(.rv),#landing .plan:not(.rv),#landing .sech:not(.rv)')];
+  if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('rv','in'));return}
+  const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
+  els.forEach((e,i)=>{e.classList.add('rv');e.style.setProperty('--d',(i%3)*110+'ms');io.observe(e)})}
+/* ---------- sparks / embers behind the landing page (tap = burst, tap the reactor = overdrive) ---------- */
+(function(){
+  const cv=document.getElementById('fx');if(!cv)return;const cx=cv.getContext('2d');
+  if(!cx||LITE||matchMedia('(prefers-reduced-motion: reduce)').matches){cv.remove();return}
+  let W=0,H=0,P=[];const dpr=Math.min(devicePixelRatio||1,2),COL=['255,200,61','255,90,54','225,29,46','125,243,255'];
+  function size(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0)}
+  function mk(burst,x,y){const a=Math.random()*6.283,s=1.5+Math.random()*4.5;
+    return {x:burst?x:Math.random()*W,y:burst?y:H+10,vx:burst?Math.cos(a)*s:(Math.random()-.5)*.7,vy:burst?Math.sin(a)*s:-(.6+Math.random()*1.7),
+      r:.8+Math.random()*2.2,c:COL[(Math.random()*COL.length)|0],l:0,t:burst?35+Math.random()*30:240+Math.random()*320,b:burst}}
+  function live(){const l=document.getElementById('landing');return l&&!l.classList.contains('hide')&&!document.hidden}
+  function frame(){
+    if(!live()){cv.style.display='none';setTimeout(()=>requestAnimationFrame(frame),400);return}
+    cv.style.display='block';const want=Math.min(70,(W*H/14000)|0);
+    while(P.filter(p=>!p.b).length<want)P.push(mk(false));
+    cx.clearRect(0,0,W,H);cx.globalCompositeOperation='lighter';
+    for(const p of P){p.l++;p.x+=p.vx+(p.b?0:Math.sin((p.l+p.t)/30)*.35);p.y+=p.vy;if(p.b){p.vx*=.96;p.vy=p.vy*.96+.05}
+      const k=p.l/p.t,al=Math.sin(Math.min(1,k)*Math.PI)*(p.b?1:.75);
+      cx.fillStyle='rgba('+p.c+','+(al*.18)+')';cx.beginPath();cx.arc(p.x,p.y,p.r*3.2,0,6.283);cx.fill();
+      cx.fillStyle='rgba('+p.c+','+al+')';cx.beginPath();cx.arc(p.x,p.y,p.r,0,6.283);cx.fill()}
+    P=P.filter(p=>p.l<p.t&&p.y>-20);requestAnimationFrame(frame)}
+  size();addEventListener('resize',size);frame();
+  document.addEventListener('pointerdown',e=>{if(!live())return;if(e.target.closest('button,a,input,select,textarea,.ov'))return;
+    for(let i=0;i<18;i++)P.push(mk(true,e.clientX,e.clientY));
+    const r=e.target.closest('.reactor');if(r){r.classList.add('od');setTimeout(()=>r.classList.remove('od'),1400);for(let i=0;i<36;i++)P.push(mk(true,e.clientX,e.clientY))}});
+})();
+function showLanding(){$('#app').classList.add('hide');$('#landing').classList.remove('hide');buildBrand();fitBrand();loadLanding().finally(()=>setTimeout(initReveal,40));setTimeout(initReveal,60)}
+
+/* ---------- auth ---------- */
+function openAuth(m){authMode(m);openM('mAuth')}
+function authMode(m,note){
+  const e=esc(authEmail);
+  const T={
+   login:`<h2 style="text-align:center">Welcome back</h2><label class="f">Email (or admin username)</label><input id="aId" autocomplete="username"><label class="f">Password</label><input id="aPw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"><div class="err" id="aErr"></div><button class="pri" style="width:100%" onclick="doLogin()">Log in</button><div class="alinks"><a onclick="authMode('forgot')">Forgot password?</a><a onclick="authMode('signup')">Create account</a></div>`,
+   signup:`<h2 style="text-align:center">Create your account</h2><label class="f">Email</label><input id="aId" type="email" autocomplete="email"><label class="f">Password (min 8 characters)</label><input id="aPw" type="password" autocomplete="new-password"><label class="f">Confirm password</label><input id="aPw2" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignup()"><div class="err" id="aErr"></div><button class="pri" style="width:100%" onclick="doSignup()">Send verification code</button><div class="alinks"><span></span><a onclick="authMode('login')">I have an account</a></div>`,
+   verify:`<h2 style="text-align:center">Verify your email</h2><p class="mut" style="text-align:center;margin:8px 0">We sent a 6-digit code to <b>${e}</b></p><input id="aCode" class="otp" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="••••••" onkeydown="if(event.key==='Enter')doVerify()"><div class="err" id="aErr"></div><button class="pri" style="width:100%" onclick="doVerify()">Verify & continue</button><div class="alinks"><a id="rsB" onclick="resend('verify')">Resend code</a><a onclick="authMode('login')">Back</a></div>`,
+   forgot:`<h2 style="text-align:center">Reset password</h2><p class="mut" style="text-align:center;margin:8px 0">Enter your email — we send a code.</p><label class="f">Email</label><input id="aId" type="email" value="${e}" onkeydown="if(event.key==='Enter')doForgot()"><div class="err" id="aErr"></div><button class="pri" style="width:100%" onclick="doForgot()">Send reset code</button><div class="alinks"><span></span><a onclick="authMode('login')">Back to login</a></div>`,
+   reset:`<h2 style="text-align:center">Set a new password</h2><p class="mut" style="text-align:center;margin:8px 0">Code sent to <b>${e}</b> (if the account exists)</p><input id="aCode" class="otp" maxlength="6" inputmode="numeric" placeholder="••••••"><label class="f">New password (min 8 characters)</label><input id="aPw" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doReset()"><div class="err" id="aErr"></div><button class="pri" style="width:100%" onclick="doReset()">Change password</button><div class="alinks"><a id="rsB" onclick="resend('reset')">Resend code</a><a onclick="authMode('login')">Back</a></div>`
+  };
+  $('#authBody').innerHTML=T[m];
+  if(note)$('#aErr').textContent=note;
+  if(m==='verify'||m==='reset')startCool(nextWait||30);nextWait=0;
+  const f=$('#aCode')||$('#aId');if(f)setTimeout(()=>f.focus(),50);
+}
+const aErr=m=>{$('#aErr').textContent=m};
+async function doLogin(){try{const r=await post('/auth/login',{id:$('#aId').value,pass:$('#aPw').value});
+  if(r.needVerify){authEmail=r.email;nextWait=r.wait||30;authMode('verify');return}closeM('mAuth');boot()}catch(e){aErr(e.message)}}
+async function doSignup(){const em=$('#aId').value.trim();if($('#aPw').value!==$('#aPw2').value){aErr('Passwords do not match');return}
+  try{const r=await post('/auth/signup',{email:em,password:$('#aPw').value});authEmail=em.toLowerCase();nextWait=r.wait||30;authMode('verify')}catch(e){aErr(e.message)}}
+async function doVerify(){try{await post('/auth/verify',{email:authEmail,code:$('#aCode').value});closeM('mAuth');toast('Welcome to Stark Host ⚡');boot()}catch(e){aErr(e.message)}}
+let coolT=null,coolLeft=0,nextWait=0;
+function paintCool(){const b=$('#rsB');if(!b)return;if(coolLeft>0){b.textContent='Resend code in '+coolLeft+'s';b.style.opacity='.5';b.style.pointerEvents='none'}else{b.textContent='Resend code';b.style.opacity='';b.style.pointerEvents=''}}
+function startCool(s){clearInterval(coolT);coolLeft=Math.max(0,Math.ceil(s||0));paintCool();if(coolLeft<=0)return;
+  coolT=setInterval(()=>{coolLeft--;paintCool();if(coolLeft<=0)clearInterval(coolT)},1000)}
+async function resend(purpose){if(coolLeft>0)return;
+  try{const r=await post('/auth/resend',{email:authEmail,purpose});$('#aErr').textContent='';toast('New code sent — check inbox & spam');startCool(r.wait||60)}
+  catch(e){aErr(e.message);const m=/wait (\d+) seconds/.exec(e.message);startCool(m?+m[1]:(/hour/.test(e.message)?3600:60))}}
+async function doForgot(){const em=$('#aId').value.trim();try{const r=await post('/auth/forgot',{email:em});authEmail=em.toLowerCase();nextWait=r.wait||30;authMode('reset')}catch(e){aErr(e.message)}}
+async function doReset(){try{await post('/auth/reset',{email:authEmail,code:$('#aCode').value,password:$('#aPw').value});toast('Password changed — log in');authMode('login')}catch(e){aErr(e.message)}}
+async function logout(){try{await post('/auth/logout')}catch(e){}me=null;location.hash='';showLanding()}
+
+/* ---------- app shell ---------- */
+const TITLES={dash:'Dashboard',projects:'My Projects',dbs:'Databases',billing:'Plans & Billing',redeem:'Redeem Key',account:'Account','a-overview':'Admin · Overview','a-users':'Admin · Users','a-uproj':'Admin · User projects','a-keys':'Admin · License Keys','a-payments':'Admin · Payments','a-plans':'Admin · Plans','a-projects':'Admin · All Projects','a-settings':'Admin · Settings'};
+function buildSide(){
+  const L=(v,i,t)=>`<a data-v="${v}" href="#/${v}">${i} ${t}</a>`;
+  let h=`<div class="brandrow">${reactor(40)}<div><div class="bname">STARK&nbsp;<span>HOST</span></div><div class="bsub">Arc-reactor hosting</div></div></div>`;
+  h+=L('dash','🏠','Dashboard')+L('projects','🚀','My Projects')+L('dbs','🗄','Databases')+L('billing','💎','Plans & Billing')+L('redeem','🔑','Redeem Key')+L('account','👤','Account');
+  h+=`<a class="sup" href="${esc(me.support)}" target="_blank" rel="noopener noreferrer">💬 Stark Host Support Channel</a>`;
+  if(me.role==='admin')h+=`<div class="grp">Admin panel</div>`+L('a-overview','📊','Overview')+L('a-users','👥','Users')+L('a-keys','🔑','License keys')+L('a-payments','💳','Payments')+L('a-plans','⚙','Plans')+L('a-projects','📦','All projects')+L('a-settings','🛠','Settings');
+  h+=`<div class="sp"></div><a onclick="logout()">⏻ Logout</a><div class="dev">❤️ Developer By <b>Junaid-Niz</b> 💔<br><a href="https://t.me/junaidaliniz" target="_blank" rel="noopener noreferrer">💬 Telegram Channel</a></div>`;
+  $('#side').innerHTML=h;
+}
+const curView=()=>location.hash.replace('#/','').split('?')[0]||'dash';
+async function boot(){
+  try{me=await api('/me')}catch(e){me=null}
+  if(!me){showLanding();return}
+  $('#landing').classList.add('hide');$('#app').classList.remove('hide');
+  buildSide();await load();renderView();
+}
+async function load(){
+  if(!me)return;
+  try{projects=await api('/projects');me=await api('/me')}catch(e){return}
+  $('#meChip').textContent=(me.role==='admin'?'ADMIN · ':'')+me.planName;
+  const v=curView();if(v==='dash'||v==='projects')renderView();
+}
+function renderView(){
+  if(!me)return;
+  let v=curView();if(!VIEWS[v]||(v.startsWith('a-')&&me.role!=='admin'))v='dash';
+  document.querySelectorAll('.side a[data-v]').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  $('#ptitle').textContent=TITLES[v];$('#side').classList.remove('open');
+  Promise.resolve(VIEWS[v]()).catch(e=>{$('#view').innerHTML='<div class="panel err">'+esc(e.message)+'</div>'});
+}
+window.addEventListener('hashchange',renderView);
+
+/* ---------- dashboard ---------- */
+function ring(p,label,sub){const c=2*Math.PI*44,d=Math.min(100,Math.max(0,p))/100*c;
+ return `<div class="ringbox"><svg viewBox="0 0 110 110" width="130" height="130"><defs><linearGradient id="rg${label}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc83d"/><stop offset="1" stop-color="#e11d2e"/></linearGradient></defs><circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="55" cy="55" r="44" fill="none" stroke="url(#rg${label})" stroke-width="8" stroke-linecap="round" stroke-dasharray="${d} ${c}" transform="rotate(-90 55 55)"/><text x="55" y="53" text-anchor="middle" fill="#fff" font-size="19" font-weight="800">${Math.round(p)}%</text><text x="55" y="70" text-anchor="middle" fill="#a89aa0" font-size="10">${label}</text></svg><small>${esc(sub)}</small></div>`}
+function viewDash(){
+  const L=me.limits,U=me.usage,adm=me.role==='admin',paid=me.plan!=='free'&&!adm;
+  const run=projects.filter(p=>p.status==='running').length,pc=(a,b)=>b?a/b*100:0;
+  $('#view').innerHTML=`<div class="planbar panel"><div><div class="mut">CURRENT PLAN</div><div class="planname">${esc(me.planName)} ${paid?'<span class="tagp">PURCHASED</span>':''}</div>
+   <div class="mut">${paid?'Valid until <b>'+fmtDate(me.planUntil)+'</b> · '+daysLeft(me.planUntil)+' days left'+(me.autoRenew?' · auto-renew on':''):adm?'Unlimited resources':'Free plan — upgrade for more RAM, CPU & SSD'}</div></div>
+   <button class="pri" onclick="location.hash='#/billing'">⚡ ${paid?'Renew / change plan':'Upgrade'}</button></div>
+   <div class="rings">${ring(pc(U.liveRam||0,L.ram),'RAM',fmtMB(Math.round(U.liveRam||0))+' used of '+fmtMB(L.ram))}${ring(pc(U.liveCpu||0,L.cpu),'CPU',Math.round((U.liveCpu||0)*100)+'% used · '+L.cpu+' cores')}${ring(pc(U.disk,L.disk*1024),'SSD',fmtMB(U.disk)+' / '+L.disk+' GB')}</div>
+   <div class="stats3"><div class="sbox"><b>${U.projects}<small> / ${L.projects}</small></b><small>Projects</small></div><div class="sbox"><b style="color:var(--ok)">${run}</b><small>Running now</small></div><div class="sbox"><b>${U.dbs}<small> / ${L.dbs}</small></b><small>Databases</small></div></div>
+   <div class="panel"><h3>Quick start</h3><div class="row"><button class="pri" onclick="location.hash='#/projects';setTimeout(openNew,50)">＋ New project</button><button onclick="location.hash='#/dbs'">🗄 Databases</button><button onclick="location.hash='#/redeem'">🔑 Redeem key</button><a class="chip" style="text-decoration:none" href="${esc(me.support)}" target="_blank" rel="noopener noreferrer">💬 Support channel</a></div></div>`;
+}
+
+/* ---------- projects ---------- */
+function viewProjects(){
+  const L=me.limits,U=me.usage;
+  $('#view').innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:14px"><div class="mut">${U.projects}/${L.projects} projects · RAM in use ${fmtMB(Math.round(U.liveRam||0))} of ${fmtMB(L.ram)} · CPU ${Math.round((U.liveCpu||0)*100)}%</div><button class="pri" onclick="openNew()">＋ New project</button></div><div class="grid" id="grid"></div>`;
+  render();
+}
+function projUrl(p){const sch=location.protocol==='https:'?'https':'http';return p.host?`${sch}://${p.host}`:''}
+function render(){
+  const g=$('#grid');if(!g)return;
+  if(!projects.length){g.innerHTML='<div class="empty">No projects yet — tap <b>New project</b> to deploy your first app 🚀</div>';return}
+  g.innerHTML=projects.map(p=>{
+    const on=p.status==='running',wait=p.status==='deploying'||p.status==='restarting',u=projUrl(p);
+    const lang=RTS[p.runtime==='auto'?(p.detected||'auto'):p.runtime]||p.runtime;
+    return `<div class="card" data-id="${p.id}">
+      <div class="top"><div><div class="name">${esc(p.name)}</div><div class="badge">${esc(lang)}${p.repo?' · 🔗 git':''} · ${fmtMB(p.ram)} · ${p.cpu} CPU</div></div>
+      <div class="pill ${on?'on':wait?'wait':''}"><span class="dot"></span>${esc(p.status)}</div></div>
+      ${u?`<a class="url" href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`:'<span class="url s">domain is being prepared…</span>'}
+      <div class="acts" style="margin-top:10px">
+        ${on?`<button data-a="stop">⏹ Stop</button>`:`<button data-a="start">▶ Start</button>`}
+        <button data-a="restart">↻ Restart</button><button data-a="logs">📜 Logs</button><button data-a="files">📁 Files</button><button data-a="zip">⬇ ZIP</button>
+        <button data-a="cfg">⚙ Settings</button><button class="dng" data-a="del">🗑</button>
+      </div>
+      <div class="drop" data-drop role="button" tabindex="0">⬆ Drop a .zip or file here (or tap) to deploy</div></div>`}).join('');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#grid [data-a]');if(!b)return;
+  const id=b.closest('.card').dataset.id,a=b.dataset.a,p=projects.find(x=>x.id===id);if(!p)return;
+  if(a==='logs')openLogs(p);else if(a==='files')openFiles(p);else if(a==='cfg')openProj(p);else if(a==='zip')dlProjectZip(p);else if(a==='del')del(p);else act(id,a);
+});
+/* one permanent file input OUTSIDE #grid — the grid re-renders every 5s, which used to delete the picker's input while the phone's file chooser was open */
+let upTarget='';
+document.addEventListener('click',e=>{const d=e.target.closest&&e.target.closest('#grid [data-drop]');if(!d)return;upTarget=d.closest('.card').dataset.id;$('#projUp').click()});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const d=e.target.closest&&e.target.closest('#grid [data-drop]');if(d){upTarget=d.closest('.card').dataset.id;$('#projUp').click()}});
+$('#projUp').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f&&upTarget){toast('Uploading '+f.name+'…');up(upTarget,f)}});
+document.addEventListener('dragover',e=>{const d=e.target.closest&&e.target.closest('#grid [data-drop]');if(d){e.preventDefault();d.classList.add('over')}});
+document.addEventListener('dragleave',e=>{const d=e.target.closest&&e.target.closest('#grid [data-drop]');if(d)d.classList.remove('over')});
+document.addEventListener('drop',e=>{const d=e.target.closest&&e.target.closest('#grid [data-drop]');if(d){e.preventDefault();d.classList.remove('over');up(d.closest('.card').dataset.id,e.dataTransfer.files[0])}});
+
+function openNew(){$('#nerr').textContent='';$('#nRt').value='auto';openM('mNew')}
+async function createProject(){
+  try{await post('/projects',{name:$('#nName').value,runtime:$('#nRt').value,cmd:$('#nCmd').value,repo:$('#nRepo').value,branch:$('#nBranch').value,token:$('#nToken').value});
+    const git=$('#nRepo').value.trim();
+    closeM('mNew');['nName','nCmd','nRepo','nBranch','nToken'].forEach(i=>$('#'+i).value='');
+    toast(git?'Created — cloning from Git & deploying…':'Project created — upload your code ✓');load()}
+  catch(e){$('#nerr').textContent=e.message}
+}
+async function act(id,a){
+  toast(a==='stop'?'Stopping…':'Starting…');
+  try{await post('/projects/'+id+'/'+a);toast('Done ✓')}catch(e){toast(e.message,true)}
+  load();
+}
+async function del(p){
+  if(!await uiConfirm('This permanently deletes "'+p.name+'", all its files and its running container.',{title:'Delete project?',ok:'Delete project'}))return;
+  try{await api('/projects/'+p.id,{method:'DELETE'});toast('Deleted')}catch(e){toast(e.message,true)}
+  load();
+}
+
+/* ---------- project settings ---------- */
+async function openProj(p){cur=p.id;try{const r=await api('/dbs');dbs=r.dbs;dbInfo=r}catch(e){}fillProj(p);tab('gen');openM('mProj')}
+const curP=()=>projects.find(x=>x.id===cur);
+function fillProj(p){
+  $('#pTitle').textContent=p.name;$('#pRt').value=p.runtime;$('#pCmd').value=p.cmd;
+  $('#pDet').textContent=p.runtime==='auto'&&p.detected?'Detected language: '+(RTS[p.detected]||p.detected):'';
+  $('#pRepo').value=p.repo;$('#pBranch').value=p.branch;$('#pToken').value='';
+  $('#pToken').placeholder=p.hasToken?'token saved (type to replace)':'token (only for private repos)';
+  $('#pHookBox').style.display=p.hook?'block':'none';$('#pHook').value=p.hook?location.origin+p.hook:'';
+  $('#pPull').style.display=p.repo?'':'none';
+  $('#pEnv').value=Object.entries(p.env).map(([k,v])=>k+'='+v).join('\n');
+  $('#pDb').innerHTML=dbs.length?dbs.map(d=>`<option value="${d.id}">${esc(KIND[d.kind]||d.kind)} — ${esc(d.name)}</option>`).join(''):'<option value="">(no databases yet — create one below)</option>';
+  $('#rRam').value=p.ram;$('#rCpu').value=p.cpu;
+  $('#rHint').textContent='These are the MAXIMUM limits of this project — live usage is on the project card. Your plan: '+fmtMB(me.limits.ram)+' RAM and '+me.limits.cpu+' CPU in total, shared by all your projects.';
+  const sch=location.protocol==='https:'?'https':'http';
+  $('#dGen').textContent=p.host||'(waiting for server IP detection…)';
+  $('#dGenH').textContent=p.host?'Works instantly, no DNS setup needed. '+sch+'://'+p.host:'';
+  const tgt=(me.ip||'<server-ip>');
+  $('#dHelp').innerHTML='Add a DNS record at your domain provider: <b>A</b> record → your server IP, or <b>CNAME</b> → <code>'+esc(p.host||'your generated domain')+'</code>. HTTPS certificate is issued automatically.';
+  $('#dLock').classList.toggle('hide',!!me.limits.custom);$('#dNew').disabled=!me.limits.custom;
+  $('#dList').innerHTML=p.custom.map(d=>`<div class="item"><span>${esc(d)} <small id="chk-${esc(d)}" style="color:var(--mut)"></small></span><span class="row"><button data-chk="${esc(d)}">Check DNS</button><button class="dng" data-rm="${esc(d)}">✕</button></span></div>`).join('');
+}
+$('#pTabs').addEventListener('click',e=>{if(e.target.dataset.t)tab(e.target.dataset.t)});
+function tab(t){document.querySelectorAll('#pTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));['gen','vars','res','dom'].forEach(s=>$('#s-'+s).classList.toggle('on',s===t))}
+async function refill(){await load();const p=curP();if(p){try{const r=await api('/dbs');dbs=r.dbs}catch(e){}fillProj(p)}}
+async function saveCfg(redeploy){
+  $('#gErr').textContent='';
+  try{
+    const b={runtime:$('#pRt').value,cmd:$('#pCmd').value,repo:$('#pRepo').value,branch:$('#pBranch').value};
+    if($('#pToken').value)b.token=$('#pToken').value;
+    await post('/projects/'+cur+'/config',b);
+    if(redeploy){if($('#pRepo').value.trim())await post('/projects/'+cur+'/sync');else await post('/projects/'+cur+'/restart')}
+    toast(redeploy?'Saved — redeploying…':'Saved ✓');await refill()
+  }catch(e){$('#gErr').textContent=e.message}
+}
+async function pull(){try{await post('/projects/'+cur+'/sync');toast('Pulling latest code & redeploying…');load()}catch(e){$('#gErr').textContent=e.message}}
+async function saveEnv(restart){
+  $('#vErr').textContent='';const env={};
+  for(const line of $('#pEnv').value.split('\n')){const l=line.trim();if(!l||l[0]==='#')continue;const i=l.indexOf('=');if(i<1){$('#vErr').textContent='Bad line (use KEY=value): '+l;return}env[l.slice(0,i).trim()]=l.slice(i+1).trim()}
+  try{await post('/projects/'+cur+'/env',{env});if(restart)await post('/projects/'+cur+'/restart');toast(restart?'Saved & restarted ✓':'Saved ✓');await refill()}catch(e){$('#vErr').textContent=e.message}
+}
+async function attach(a){
+  const id=$('#pDb').value;if(!id){$('#vErr').textContent='Create a database first';return}
+  try{await post('/projects/'+cur+'/'+a,{dbId:id});toast(a==='attach'?'Attached — restart the app to use it':'Detached');await refill()}catch(e){$('#vErr').textContent=e.message}
+}
+async function quickDb(kind){
+  const p=curP();$('#vErr').textContent='';
+  try{const d=await post('/dbs',{kind,mode:'managed',name:p.name+' '+kind});await post('/projects/'+cur+'/attach',{dbId:d.id});toast('Database created & attached ✓ — restart the app');await refill()}catch(e){$('#vErr').textContent=e.message}
+}
+async function saveRes(){
+  $('#rErr').textContent='';
+  try{await post('/projects/'+cur+'/resources',{ram:parseInt($('#rRam').value,10),cpu:parseFloat($('#rCpu').value)});await post('/projects/'+cur+'/restart');toast('Resources saved & app restarted ✓');await refill()}catch(e){$('#rErr').textContent=e.message}
+}
+async function genDom(sub){try{await post('/projects/'+cur+'/domain',{sub});toast('Domain updated ✓');await refill()}catch(e){$('#dErr').textContent=e.message}}
+async function chooseDom(){const s=await uiPrompt('Choose subdomain',{ph:'my-app',hint:'Only a-z, 0-9 and -',ok:'Use this',icon:'globe'});if(s)genDom(s)}
+async function addDom(){$('#dErr').textContent='';try{await post('/projects/'+cur+'/domains',{domain:$('#dNew').value});$('#dNew').value='';await refill()}catch(e){$('#dErr').textContent=e.message}}
+$('#dList').addEventListener('click',async e=>{
+  const c=e.target.dataset.chk,r=e.target.dataset.rm;
+  if(c){const s=document.getElementById('chk-'+c);s.textContent='checking…';
+    try{const d=await api('/projects/'+cur+'/domains/check?domain='+encodeURIComponent(c));s.textContent=d.ok?'✅ DNS OK':'⏳ not pointing here yet'+(d.ips.length?' (now: '+d.ips.join(', ')+')':'');s.style.color=d.ok?'var(--ok)':'var(--warn)'}catch(x){s.textContent=x.message}}
+  if(r){try{await api('/projects/'+cur+'/domains?domain='+encodeURIComponent(r),{method:'DELETE'});await refill()}catch(x){$('#dErr').textContent=x.message}}
+});
+
+/* ---------- databases ---------- */
+async function viewDbs(){
+  const r=await api('/dbs');dbs=r.dbs;dbInfo=r;
+  const en=r.engines;
+  const opt=(k,t)=>`<option value="${k}" ${en[k]?'':'disabled'}>${t}${en[k]?'':' (not enabled on server)'}</option>`;
+  $('#view').innerHTML=`<div class="two">
+   <div class="panel"><h3>➕ Create a database (built-in, private to you)</h3><label class="f">Type</label><select id="dbK">${opt('mongo','🍃 MongoDB')}${opt('postgres','🐘 PostgreSQL (SQL)')}${opt('mysql','🐬 MySQL (SQL)')}</select><label class="f">Name</label><input id="dbN" placeholder="my-database"><div class="err" id="dbE"></div><button class="pri" onclick="createDb()">Create</button><div class="hint">${dbs.length} of ${r.limit} databases used on your plan. Inside a project you can create + attach one with a single click.</div></div>
+   <div class="panel"><h3>🔌 Connect an external database</h3><label class="f">Type</label><select id="xK"><option value="mongo">🍃 MongoDB / Atlas</option><option value="postgres">🐘 PostgreSQL</option><option value="mysql">🐬 MySQL / MariaDB</option><option value="redis">🟥 Redis</option><option value="other">🗄 Other</option></select><label class="f">Name</label><input id="xN" placeholder="Atlas cluster"><label class="f">Connection string</label><input id="xU" placeholder="mongodb+srv://user:pass@cluster.mongodb.net/db"><div class="err" id="xE"></div><button onclick="connectDb()">Save connection</button></div></div>
+   <div class="panel"><h3>Your databases</h3><div class="tscroll"><table class="tbl"><tr><th>Name</th><th>Type</th><th>Connection string</th><th></th></tr>${dbs.length?dbs.map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(KIND[d.kind]||d.kind)} ${d.managed?'<span class="st ok">built-in</span>':'<span class="st wt">external</span>'}</td><td class="mono"><span id="u-${d.id}">••••••••••</span></td><td class="row"><button data-dbact="show" data-id="${d.id}">👁</button><button data-dbact="copy" data-id="${d.id}">Copy</button><button data-dbact="test" data-id="${d.id}">Test</button><button class="dng" data-dbact="del" data-id="${d.id}">🗑</button></td></tr>`).join(''):'<tr><td colspan="4" class="mut">No databases yet.</td></tr>'}</table></div></div>`;
+}
+async function createDb(){$('#dbE').textContent='';try{await post('/dbs',{kind:$('#dbK').value,mode:'managed',name:$('#dbN').value});toast('Database created ✓');viewDbs()}catch(e){$('#dbE').textContent=e.message}}
+async function connectDb(){$('#xE').textContent='';try{await post('/dbs',{kind:$('#xK').value,mode:'external',name:$('#xN').value,uri:$('#xU').value});toast('Connection saved ✓');viewDbs()}catch(e){$('#xE').textContent=e.message}}
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-dbact]');if(!b)return;const d=dbs.find(x=>x.id===b.dataset.id);if(!d)return;
+  const a=b.dataset.dbact;
+  if(a==='show'){const s=$('#u-'+d.id);s.textContent=s.textContent.startsWith('•')?d.uri:'••••••••••'}
+  else if(a==='copy')copy(d.uri);
+  else if(a==='test'){toast('Testing…');try{const r=await post('/dbs/'+d.id+'/test');toast((r.ok?'✅ ':'⚠ ')+r.msg,!r.ok)}catch(x){toast(x.message,true)}}
+  else if(a==='del'){if(!await uiConfirm(d.managed?'All data inside this database will be deleted forever.':'Only the saved connection is removed — your external server is not touched.',{title:'Delete "'+d.name+'"?',ok:'Delete'}))return;try{await api('/dbs/'+d.id,{method:'DELETE'});toast('Deleted');viewDbs()}catch(x){toast(x.message,true)}}
+});
+
+/* ---------- billing ---------- */
+const STAT={approved:'ok',pending:'wt',rejected:'bad'};
+async function viewBilling(){
+  const [pl,hist]=await Promise.all([api('/plans'),api('/billing/history')]);
+  const cards=pl.plans.map((p,i)=>`<div class="plan ${i===2?'hot':''}">${me.plan===p.id?'<span class="cur">CURRENT</span>':''}<h3>${esc(p.name)}</h3><div class="price">${p.price?esc(p.price)+' <small>'+esc(pl.currency)+' / month</small>':'Free'}</div>${planList(p)}
+   ${p.price?`<div class="acts"><button class="pri" onclick="buyDlg('${p.id}')">🛒 Buy</button></div></div>`:''}</div>`).join('');
+  $('#view').innerHTML=`<div class="pgrid">${cards}</div>${!pl.stripe&&!pl.manual&&!pl.crypto?'<div class="panel mut">Online payment is not enabled yet — redeem a key from the Stark Host support channel to activate a plan.</div>':''}
+   <div class="panel"><h3>Payment history</h3><div class="tscroll"><table class="tbl"><tr><th>Date</th><th>Plan</th><th>Method</th><th>Txn</th><th>Status</th></tr>${hist.length?hist.map(h=>`<tr><td>${fmtDT(h.created)}</td><td>${esc(h.plan)} × ${h.months}m</td><td>${esc(h.method)}</td><td class="mono">${esc(h.txnId)}</td><td><span class="st ${STAT[h.status]||''}">${esc(h.status)}</span></td></tr>`).join(''):'<tr><td colspan="5" class="mut">Nothing yet.</td></tr>'}</table></div></div>`;
+  window._plans=pl;
+}
+function buyDlg(id){const pl=window._plans,p=pl.plans.find(x=>x.id===id);
+  openGen(`<h2>Buy ${esc(p.name)}</h2><p class="mut" style="margin-bottom:12px">${esc(p.price)} ${esc(pl.currency)} / month · choose how to pay</p><div class="acts" style="flex-direction:column">${pl.stripe?`<button class="pri" style="width:100%" onclick="closeM('mGen');buyCard('${id}')">💳 Pay by card — auto-renew every month</button>`:''}${pl.manual?`<button style="width:100%" onclick="closeM('mGen');manualPay('${id}')">🏦 Pay manually (Easypaisa / JazzCash / bank)</button>`:''}<button style="width:100%" onclick="closeM('mGen');location.hash='#/redeem'">🔑 I already have a key</button>${!pl.stripe&&!pl.manual&&!pl.crypto?`<a class="chip" style="text-align:center;text-decoration:none;padding:12px" href="${esc(pl.support)}" target="_blank" rel="noopener noreferrer">💬 Contact support to buy</a>`:''}</div><div class="row" style="margin-top:12px"><button onclick="closeM('mGen')">Close</button></div>`)}
+async function buyCard(id){try{const r=await post('/billing/checkout',{plan:id});location.href=r.url}catch(e){toast(e.message,true)}}
+function manualPay(id){const pl=window._plans,p=pl.plans.find(x=>x.id===id);
+  openGen(`<h2>Pay for ${esc(p.name)}</h2><div class="panel" style="white-space:pre-wrap;font-size:13px">${esc(pl.instructions)}</div><label class="f">Months</label><select id="mpM">${[1,2,3,6,12].map(m=>`<option value="${m}">${m} month${m>1?'s':''} — ${(p.price*m).toFixed(2)} ${esc(pl.currency)}</option>`).join('')}</select><label class="f">Transaction ID / reference</label><input id="mpT"><label class="f">Note (optional)</label><input id="mpN"><div class="err" id="mpE"></div><div class="row"><button class="pri" onclick="sendManual('${id}')">I have paid — submit</button><button onclick="closeM('mGen')">Cancel</button></div>`)}
+async function sendManual(id){try{await post('/billing/manual',{plan:id,months:parseInt($('#mpM').value,10),txn:$('#mpT').value,note:$('#mpN').value});closeM('mGen');toast('Submitted — admin will approve soon ✓');viewBilling()}catch(e){$('#mpE').textContent=e.message}}
+
+function viewRedeem(){
+  $('#view').innerHTML=`<div class="panel" style="max-width:520px"><h3>🔑 Redeem a Stark Host key</h3><p class="mut" style="margin-bottom:10px">Got a key from a friend or the admin? Enter it to activate the plan instantly.</p><input id="rk" class="mono" placeholder="STARK-XXXX-XXXX-XXXX" style="text-transform:uppercase" onkeydown="if(event.key==='Enter')redeem()"><div class="err" id="rkE"></div><button class="pri" onclick="redeem()">Activate</button></div>`;
+}
+async function redeem(){try{const r=await post('/redeem',{code:$('#rk').value});toast('Plan activated: '+r.plan+' × '+r.months+' month(s) 🎉');await load();location.hash='#/dash'}catch(e){$('#rkE').textContent=e.message}}
+
+function viewAccount(){
+  $('#view').innerHTML=`<div class="two"><div class="panel"><h3>Account</h3><p><b>${esc(me.email)}</b></p><p class="mut" style="margin:6px 0 12px">Plan: ${esc(me.planName)}${me.plan!=='free'&&me.role!=='admin'?' · until '+fmtDate(me.planUntil):''}</p><button class="dng" onclick="logout()">Logout</button></div>
+  <div class="panel"><h3>Change password</h3><label class="f">Current password</label><input id="cpO" type="password"><label class="f">New password (min 8)</label><input id="cpN" type="password"><div class="err" id="cpE"></div><button class="pri" onclick="changePw()">Update password</button></div></div>`;
+}
+async function changePw(){try{await post('/auth/password',{old:$('#cpO').value,new:$('#cpN').value});toast('Password updated ✓');$('#cpO').value=$('#cpN').value=''}catch(e){$('#cpE').textContent=e.message}}
+
+/* ---------- ADMIN ---------- */
+async function aOverview(){
+  const s=await api('/admin/stats');
+  const b=(n,l,c)=>`<div class="sbox"><b ${c?'style="color:'+c+'"':''}>${s[n]||0}</b><small>${l}</small></div>`;
+  $('#view').innerHTML=`<div class="stats3">${b('users','Users')}${b('premium','Premium users','var(--b)')}${b('projects','Projects')}${b('running','Running now','var(--ok)')}${b('dbs','Databases')}${b('pending','Payments waiting','var(--bad)')}${b('keysFree','Unused keys')}${b('unverified','Unverified emails')}</div>
+  <div class="panel"><h3>Shortcuts</h3><div class="row"><button class="pri" onclick="location.hash='#/a-keys'">🔑 Generate keys</button><button onclick="location.hash='#/a-payments'">💳 Payments</button><button onclick="location.hash='#/a-users'">👥 Users</button><button onclick="location.hash='#/a-settings'">🛠 Settings (SMTP, payments)</button></div></div>`;
+}
+let uQ='';
+async function aUsers(){
+  const us=await api('/admin/users?q='+encodeURIComponent(uQ));window._us=us;
+  $('#view').innerHTML=`<div class="panel"><div class="row" style="margin-bottom:10px"><input id="uq" placeholder="search email…" value="${esc(uQ)}" style="max-width:300px" onkeydown="if(event.key==='Enter'){uQ=this.value;aUsers()}"><button onclick="uQ=$('#uq').value;aUsers()">Search</button></div>
+  <div class="tscroll"><table class="tbl"><tr><th>Email</th><th>Plan</th><th>Projects / DBs</th><th>Status</th><th>Joined</th><th>Actions</th></tr>${us.map(u=>`<tr><td>${u.role==='admin'?'':`<a data-uv="${u.id}" style="color:var(--b);cursor:pointer;text-decoration:underline dotted" title="View projects">${esc(u.email)}</a>`}${u.role==='admin'?esc(u.email)+' <span class="st wt">admin</span>':''}</td><td>${esc(u.active)}${u.active!=='free'?'<br><small class="mut">until '+fmtDate(u.planUntil)+(u.autoRenew?' · auto':'')+'</small>':''}</td><td>${u.projects?`<a data-uv="${u.id}" style="color:var(--b);cursor:pointer" title="View projects">📦 ${u.projects}</a>`:'0'} / ${u.dbs}</td><td>${u.banned?'<span class="st bad">banned</span>':u.verified?'<span class="st ok">active</span>':'<span class="st wt">unverified</span>'}</td><td>${fmtDate(u.created)}</td><td class="row">${u.role==='admin'?'':`<button class="pri" data-ua="plan" data-id="${u.id}">⭐ Plan</button>${u.banned?`<button data-ua="unban" data-id="${u.id}">Unban</button>`:`<button data-ua="ban" data-id="${u.id}">Ban</button>`}${u.verified?'':`<button data-ua="verify" data-id="${u.id}">Verify</button>`}<button data-ua="pass" data-id="${u.id}">🔒 Pass</button><button class="dng" data-ua="del" data-id="${u.id}">🗑</button>`}</td></tr>`).join('')}</table></div></div>`;
+}
+async function userAct(id,body,msg){try{await post('/admin/users/'+id,body);toast(msg||'Done ✓');aUsers()}catch(e){toast(e.message,true)}}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-ua]');if(!b)return;const id=b.dataset.id,u=(window._us||[]).find(x=>x.id===id),a=b.dataset.ua;if(!u)return;
+  if(a==='plan'){openGen(`<h2>Set plan — ${esc(u.email)}</h2><label class="f">Plan</label><select id="spP"><option value="pro">Stark Pro</option><option value="max">Stark Max</option><option value="free">Free (remove premium)</option></select><label class="f">Months</label><input id="spM" type="number" min="1" max="120" value="1"><div class="row" style="margin-top:12px"><button class="pri" onclick="closeM('mGen');userAct('${id}',{action:'setplan',plan:$('#spP').value,months:parseInt($('#spM').value,10)},'Plan updated ✓')">Apply</button><button onclick="closeM('mGen')">Cancel</button></div>`)}
+  else if(a==='pass'){uiPrompt('Set new password',{hint:'For '+u.email+' (min 8 characters)',ph:'new password',ok:'Change',icon:'lock'}).then(p=>{if(p)userAct(id,{action:'setpass',password:p},'Password changed')})}
+  else if(a==='del'){uiConfirm('All projects, files and databases of '+u.email+' will be deleted. This cannot be undone.',{title:'Delete user?',ok:'Delete user'}).then(ok=>{if(ok)userAct(id,{action:'delete'},'User deleted')})}
+  else userAct(id,{action:a});
+});
+async function aKeys(){
+  const [ks,pl]=await Promise.all([api('/admin/keys'),api('/plans')]);window._ks=ks;
+  const now=Date.now()/1000;
+  const stat=k=>{const used=(k.used&&k.used.length)||(k.usedBy?1:0),uses=k.uses||1;if(k.expiresAt&&now>k.expiresAt)return['bad','expired'];if(used>=uses)return['bad','full'];return['ok','active']};
+  $('#view').innerHTML=`<div class="panel"><h3>🔑 Generate a key</h3><div class="fl"><div><label class="f">Plan</label><select id="kP">${pl.plans.filter(p=>p.id!=='free').map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div><div><label class="f">Months of premium</label><input id="kM" type="number" min="1" max="36" value="1"></div><div><label class="f">Members (how many users can use this key)</label><input id="kU" type="number" min="1" max="10000" value="1"></div><div><label class="f">Key expires in (days, 0 = never)</label><input id="kD" type="number" min="0" max="3650" value="0"></div></div><div class="err" id="kE"></div><button class="pri" onclick="genKeys()">Generate key</button><div class="hint">Each member who redeems gets the plan for the chosen months. After the expiry day nobody can redeem the key any more.</div></div>
+  <div class="panel"><h3>All keys</h3><div class="tscroll"><table class="tbl"><tr><th>Key</th><th>Plan</th><th>Months</th><th>Members</th><th>Key expires</th><th>Status</th><th></th></tr>${ks.map(k=>{const used=(k.used&&k.used.length)||(k.usedBy?1:0),s=stat(k);return `<tr><td class="mono">${esc(k.code)}</td><td>${esc(k.plan)}</td><td>${k.months}</td><td>${used} / ${k.uses||1}</td><td>${k.expiresAt?fmtDate(k.expiresAt):'Never'}</td><td><span class="st ${s[0]}">${s[1]}</span></td><td class="row"><button data-ka="copy" data-c="${esc(k.code)}">Copy</button><button class="dng" data-ka="del" data-c="${esc(k.code)}">🗑</button></td></tr>`}).join('')||'<tr><td colspan="7" class="mut">No keys yet.</td></tr>'}</table></div></div>`;
+}
+async function genKeys(){try{const r=await post('/admin/keys',{plan:$('#kP').value,months:parseInt($('#kM').value,10),uses:parseInt($('#kU').value,10),expireDays:parseInt($('#kD').value,10)||0});
+  window._codes=r.codes.join('\n');openGen(`<h2>Key created 🎉</h2><textarea rows="2" readonly class="mono" onclick="this.select()">${esc(window._codes)}</textarea><div class="row" style="margin-top:12px"><button class="pri" onclick="copy(window._codes)">Copy key</button><button onclick="closeM('mGen')">Close</button></div>`);aKeys()}catch(e){$('#kE').textContent=e.message}}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-ka]');if(!b)return;
+  if(b.dataset.ka==='copy')copy(b.dataset.c);
+  else if(await uiConfirm('This key will stop working.',{title:'Delete key?',ok:'Delete key'})){try{await api('/admin/keys/'+encodeURIComponent(b.dataset.c),{method:'DELETE'});aKeys()}catch(x){toast(x.message,true)}}});
+async function aPayments(){
+  const ps=await api('/admin/payments');
+  $('#view').innerHTML=`<div class="panel"><h3>Payments</h3><div class="tscroll"><table class="tbl"><tr><th>Date</th><th>User</th><th>Plan</th><th>Amount</th><th>Method</th><th>Txn / note</th><th>Status</th><th></th></tr>${ps.map(p=>`<tr><td>${fmtDT(p.created)}</td><td>${esc(p.email)}</td><td>${esc(p.plan)} × ${p.months}m</td><td>${esc(p.amount)}</td><td>${esc(p.method)}</td><td class="mono">${esc(p.txnId)}${p.note?'<br><small class="mut">'+esc(p.note)+'</small>':''}</td><td><span class="st ${STAT[p.status]||''}">${esc(p.status)}</span></td><td class="row">${p.status==='pending'?`<button class="pri" data-pa="approve" data-id="${p.id}">Approve</button><button class="dng" data-pa="reject" data-id="${p.id}">Reject</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8" class="mut">No payments yet.</td></tr>'}</table></div></div>`;
+}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-pa]');if(!b)return;
+  try{await post('/admin/payments/'+b.dataset.id,{action:b.dataset.pa});toast(b.dataset.pa==='approve'?'Approved — user is premium now ✓':'Rejected');aPayments()}catch(x){toast(x.message,true)}});
+async function aPlans(){
+  const d=await api('/admin/plans');window._pl=d.plans;
+  $('#view').innerHTML=`<div class="panel"><h3>Plans (RAM / CPU / SSD / price)</h3><div class="tscroll"><table class="tbl"><tr><th>ID</th><th>Name</th><th>RAM (MB)</th><th>CPU</th><th>SSD (GB)</th><th>Price / month (${esc(d.currency)})</th><th>Projects</th><th>DBs</th><th>Custom domain</th></tr>${d.plans.map((p,i)=>`<tr data-i="${i}"><td>${esc(p.id)}</td><td><input data-f="name" value="${esc(p.name)}"></td><td><input data-f="ram" type="number" value="${p.ram}"></td><td><input data-f="cpu" type="number" step="0.1" value="${p.cpu}"></td><td><input data-f="disk" type="number" value="${p.disk}"></td><td><input data-f="price" type="number" step="0.01" value="${p.price}" ${p.id==='free'?'disabled':''}></td><td><input data-f="projects" type="number" value="${p.projects}"></td><td><input data-f="dbs" type="number" value="${p.dbs}"></td><td><input data-f="custom" type="checkbox" ${p.custom?'checked':''} style="width:auto"></td></tr>`).join('')}</table></div><div class="err" id="plE"></div><button class="pri" onclick="savePlans()">Save plans</button><div class="hint">Changes apply to everyone immediately. Users whose usage exceeds a reduced plan get their apps stopped until they fit.</div></div>`;
+}
+async function savePlans(){
+  const out=window._pl.map(p=>({...p}));
+  document.querySelectorAll('tr[data-i]').forEach(tr=>{const p=out[+tr.dataset.i];tr.querySelectorAll('[data-f]').forEach(i=>{const f=i.dataset.f;p[f]=i.type==='checkbox'?i.checked:(f==='name'?i.value:parseFloat(i.value))})});
+  out.forEach(p=>{['ram','disk','projects','dbs'].forEach(k=>p[k]=Math.round(p[k]||0))});
+  try{await post('/admin/plans',{plans:out});toast('Plans saved ✓');aPlans()}catch(e){$('#plE').textContent=e.message}
+}
+let apRefresh=()=>aProjects(),uPid='';
+function projTable(ps,title,hint,head){
+  window._ap=ps;
+  $('#view').innerHTML=`<div class="panel">${head||''}<h3>${title}</h3><div class="hint" style="margin:0 0 10px">${hint}</div><div class="tscroll"><table class="tbl"><tr><th>Project</th><th>Owner</th><th>Status</th><th>RAM / CPU</th><th>URL</th><th></th></tr>${ps.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.owner)}</td><td><span class="st ${p.status==='running'?'ok':''}">${esc(p.status)}</span></td><td>RAM ${fmtMB(Math.round(p.usedRam||0))} / ${fmtMB(p.ram)}<br><small class="mut">CPU ${Math.round((p.usedCpu||0)/p.cpu*100)}%</small></td><td>${p.host?`<a href="${esc(projUrl(p))}" target="_blank" rel="noopener" style="color:var(--b)">${esc(p.host)}</a>`:''}</td><td class="row"><button data-ap="files" data-id="${p.id}">📁 Files</button><button data-ap="zip" data-id="${p.id}">⬇ ZIP</button><button data-ap="logs" data-id="${p.id}">📜 Logs</button><button data-ap="stop" data-id="${p.id}">⏹ Stop</button><button class="dng" data-ap="del" data-id="${p.id}">🗑</button></td></tr>`).join('')||'<tr><td colspan="6" class="mut">No projects.</td></tr>'}</table></div></div>`;
+}
+async function aProjects(){
+  apRefresh=aProjects;
+  projTable(await api('/admin/projects'),'All projects (every user)','Check a suspicious bot / script: open its files, read the logs, or download everything as a ZIP.');
+}
+async function aUserProj(){
+  apRefresh=aUserProj;
+  if(!window._us)window._us=await api('/admin/users');const u=window._us.find(x=>x.id===uPid),all=await api('/admin/projects'),em=u?u.email:'';
+  projTable(all.filter(p=>p.owner===em),'📦 Projects of '+esc(em),'Every project this user has. Open files, read logs, download ZIP, stop or delete.','<div class="row" style="margin-bottom:12px"><button onclick="location.hash=\'#/a-users\'">← Back to users</button>'+(u?'<button class="pri" onclick="dlUserZip(\''+u.id+'\',\''+esc(u.email)+'\')">⬇ Download all projects (ZIP)</button>':'')+'</div>');
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-uv]');if(!b)return;uPid=b.dataset.uv;if(location.hash==='#/a-uproj')aUserProj();else location.hash='#/a-uproj'});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-ap]');if(!b)return;const id=b.dataset.id,p=(window._ap||[]).find(x=>x.id===id);if(!p)return;
+  try{const a=b.dataset.ap;if(a==='logs')openLogs(p);else if(a==='files')openFiles(p);else if(a==='zip')dlProjectZip(((window._ap||[]).find(x=>x.id===id))||{id:id,name:'project'});else if(a==='stop'){await post('/projects/'+id+'/stop');toast('Stopped');apRefresh()}else if(await uiConfirm('Delete "'+p.name+'" of '+p.owner+' with all its files?',{title:'Delete project?',ok:'Delete project'})){await api('/projects/'+id,{method:'DELETE'});apRefresh()}}catch(x){toast(x.message,true)}});
+async function aSettings(){
+  const d=await api('/admin/settings'),s=d.settings;
+  const I=(k,l,t,ph)=>`<div><label class="f">${l}</label><input data-s="${k}" type="${t||'text'}" value="${esc(s[k])}" placeholder="${esc(ph||'')}"></div>`;
+  $('#view').innerHTML=`<div class="two"><div class="panel"><h3>✉ Email (SMTP) — for OTP codes</h3><div class="fl">${I('smtpHost','SMTP host','text','smtp.gmail.com')}${I('smtpPort','Port','text','587')}${I('smtpUser','Username')}${I('smtpPass','Password / app password','password')}${I('smtpFrom','From address','text','no-reply@yourdomain.com')}</div>
+   <div class="row" style="margin-top:12px"><input id="tmTo" placeholder="send test email to…" style="flex:1"><button onclick="testMail()">Send test</button></div><div class="hint">Without SMTP the OTP codes are only printed in the server log (<code>docker compose logs panel</code>).</div>
+   <details><summary>📖 SMTP kaise add karein? (step by step)</summary>
+   <p><b>Option 1 — Gmail (sabse aasan, test ke liye):</b><br>1) Google Account → Security → <b>2-Step Verification</b> ON karo.<br>2) Search bar me <b>App passwords</b> kholo → naam likho “Stark Host” → Create → <b>16 letters ka password</b> copy karo (spaces ke bina).<br>3) Yahan bharo: Host <code>smtp.gmail.com</code> · Port <code>587</code> · Username = aapka Gmail · Password = wo 16-letter app password · From = aapka Gmail.<br>4) <b>Save settings</b> dabao, phir “Send test” se apni email par test karo.<br><small class="mut">Gmail ki limit lagbhag 500 email/din hai.</small></p>
+   <p><b>Option 2 — Brevo (public website ke liye behtar, free 300 email/din):</b><br>brevo.com par account banao → <i>SMTP &amp; API</i> → SMTP tab → “Generate a new SMTP key”.<br>Host <code>smtp-relay.brevo.com</code> · Port <code>587</code> · Username = wahan dikhne wala SMTP login · Password = SMTP key · From = aapki verified sender email.</p>
+   <p><b>Option 3:</b> Zoho Mail (<code>smtp.zoho.com</code>, 587), Mailgun, Amazon SES — same tarah host, port, username, password bharo.</p>
+   <p><b>Dhyan:</b> From email asli aur verified honi chahiye, warna mail spam me jati hai. Port 465 bhi chalta hai (SSL). Agar “Send test” fail ho to error message yahin dikhega.</p></details></div>
+   <div class="panel"><h3>💳 Payments</h3><div class="fl">${I('currency','Currency (3 letters)','text','usd')}${I('stripeSecret','Stripe secret key (sk_…)','password')}${I('stripeWebhook','Stripe webhook secret (whsec_…)','password')}${I('cryptoMerchant','Cryptomus merchant ID')}${I('cryptoKey','Cryptomus API key (payment)','password')}</div>
+   <label class="f">Manual payment instructions (shown to users, e.g. Easypaisa / JazzCash / bank number)</label><textarea data-s="payInstructions" rows="4">${esc(s.payInstructions)}</textarea>
+   <div class="hint">Cryptomus callback is set automatically: <code>${location.origin}/api/pay/cryptomus</code> — get the Merchant ID and the <b>Payment API key</b> in Cryptomus → Merchant → Settings. Users pay in crypto, the plan turns on by itself once Cryptomus confirms.</div><div class="hint">Stripe webhook URL: <code>${location.origin}/api/pay/stripe</code> (events: checkout.session.completed, invoice.paid, customer.subscription.deleted)</div></div></div>
+  <div class="two"><div class="panel"><h3>🌐 Domains &amp; support</h3><div class="fl">${I('baseDomain','Apps domain (optional, e.g. apps.example.com)','text','empty = '+(d.autoDomain||'auto'))}${I('publicIp','Server IP (optional)','text',d.ip||'')}${I('supportUrl','Support channel link','text')}</div></div>
+   <div class="panel"><h3>🤖 Auto-payment webhook (any gateway / bot)</h3><p class="mut" style="font-size:13px;line-height:1.6">POST <code>${location.origin}/api/pay/webhook</code><br>header <code>X-Webhook-Secret: (below)</code><br>body <code>{"email":"user@x.com","plan":"pro","months":1,"txn":"UNIQUE-ID"}</code></p>${I('payWebhookSecret','Webhook secret','text')}</div></div>
+  <div class="err" id="stE"></div><button class="pri" onclick="saveSettings()">Save settings</button>`;
+}
+async function saveSettings(){
+  const o={};document.querySelectorAll('[data-s]').forEach(i=>o[i.dataset.s]=i.value);
+  try{await post('/admin/settings',o);toast('Settings saved ✓');aSettings()}catch(e){$('#stE').textContent=e.message}
+}
+async function testMail(){try{await post('/admin/testmail',{to:$('#tmTo').value});toast('Test email sent ✓')}catch(e){toast(e.message,true)}}
+
+const VIEWS={dash:viewDash,projects:viewProjects,dbs:viewDbs,billing:viewBilling,redeem:viewRedeem,account:viewAccount,'a-overview':aOverview,'a-users':aUsers,'a-keys':aKeys,'a-payments':aPayments,'a-plans':aPlans,'a-projects':aProjects,'a-uproj':aUserProj,'a-settings':aSettings};
+
+
+/* ---------- downloads: progress shown in the site's own bar, unique file name (no Chrome "Download file again?") ---------- */
+function fmtB(n){return n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB'}
+function stampNow(){return new Date().toISOString().slice(0,16).replace(/[-:T]/g,'').replace(/^(\d{8})/,'$1-')}
+async function dlGet(url,name,label){
+  const bar=$('#upbar'),fill=$('#upf'),box=$('#upk');
+  $('#upn').textContent='⬇ '+label;$('#upt').textContent='Preparing your ZIP…';$('#upp').textContent='';
+  fill.style.width='0%';box.classList.add('ind');bar.classList.add('show');
+  try{
+    const r=await fetch(url,{credentials:'same-origin'});
+    if(r.status===401){showLogin();throw new Error('Please sign in')}
+    if(!r.ok){let m='Download failed';try{m=(await r.json()).error||m}catch(e){}throw new Error(m)}
+    const total=+r.headers.get('Content-Length')||0;let got=0;const parts=[];
+    if(r.body&&r.body.getReader){
+      const rd=r.body.getReader();
+      for(;;){const x=await rd.read();if(x.done)break;parts.push(x.value);got+=x.value.length;
+        $('#upt').textContent='Packing & downloading…';$('#upp').textContent=fmtB(got);
+        if(total){box.classList.remove('ind');fill.style.width=Math.round(got/total*100)+'%'}}
+    }else{const b=await r.blob();parts.push(b);got=b.size}
+    if(got<200)throw new Error('This project has no files yet — upload your ZIP first');
+    const blob=new Blob(parts,{type:'application/zip'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    box.classList.remove('ind');fill.style.width='100%';$('#upt').textContent='Saved ✓';$('#upp').textContent=fmtB(got);
+    toast('✓ '+name+' ('+fmtB(got)+')');setTimeout(()=>bar.classList.remove('show'),1700);
+  }catch(e){box.classList.remove('ind');fill.style.width='0%';$('#upt').textContent='Failed';toast(e.message,true);setTimeout(()=>bar.classList.remove('show'),2800)}
+}
+function dlProjectZip(p){dlGet('/api/projects/'+p.id+'/zip',(p.name||'project')+'-'+stampNow()+'.zip',(p.name||'project')+' · ZIP')}
+function dlUserZip(id,email){dlGet('/api/admin/users/'+id+'/zip',String(email).replace(/[^a-z0-9._-]/gi,'_')+'-projects-'+stampNow()+'.zip',email+' · all projects')}
+
+function sendUpload(url,fd,label,okMsg,after){
+  const bar=$('#upbar'),fill=$('#upf'),box=$('#upk');
+  $('#upn').textContent=label;$('#upt').textContent='Uploading…';$('#upp').textContent='0%';
+  fill.style.width='0%';box.classList.remove('ind');bar.classList.add('show');
+  const x=new XMLHttpRequest();
+  x.open('POST',url);x.withCredentials=true;
+  x.upload.onprogress=e=>{if(!e.lengthComputable)return;const p=Math.round(e.loaded/e.total*100);fill.style.width=p+'%';$('#upp').textContent=p+'%';
+    if(p>=100){$('#upt').textContent='Processing / deploying…';box.classList.add('ind')}};
+  const done=(ok,msg)=>{box.classList.remove('ind');if(ok){fill.style.width='100%';$('#upp').textContent='100%';$('#upt').textContent=okMsg}else{$('#upt').textContent='Failed'}
+    toast(msg,!ok);setTimeout(()=>bar.classList.remove('show'),ok?1300:2600);load();if(after)after(ok)};
+  x.onload=()=>{let m='';try{m=JSON.parse(x.responseText).error||''}catch(e){}
+    if(x.status===401){showLogin();done(false,'Please sign in');return}
+    if(x.status>=200&&x.status<300)done(true,okMsg);else done(false,m||'Upload failed')};
+  x.onerror=()=>done(false,'Network error');
+  x.send(fd);
+}
+function up(id,f){
+  if(!f)return;const fd=new FormData();fd.append('file',f);
+  sendUpload('/api/projects/'+id+'/upload',fd,f.name,'Deployed ✓');
+}
+function pickFiles(list){
+  const fs=[...list];if(!fs.length||!fProj)return;
+  const fd=new FormData();
+  fs.forEach(f=>{fd.append('file',f);fd.append('paths',f.webkitRelativePath||f.name)});
+  fd.append('dir',$('#fDir').value.trim());
+  fd.append('extract',$('#fExtract').checked?'1':'0');
+  fd.append('restart',$('#fAuto').checked?'1':'0');
+  sendUpload('/api/projects/'+fProj.id+'/files/upload',fd,fs.length===1?fs[0].name:fs.length+' files',$('#fAuto').checked?'Uploaded & deployed ✓':'Uploaded ✓ (restart to apply)',()=>listFiles());
+}
+
+/* ---------- logs ---------- */
+const ERR=/\b(error|exception|traceback|panic|fatal|failed|failure|cannot|unable|ENOENT|EADDRINUSE|ECONNREFUSED|denied|killed|segmentation)\b|npm ERR!|NOVA:/i;
+const HINTS=[
+ [/Cannot find module '([^']+)'/i,m=>`Missing Node module "${m[1]}" — add it to package.json (npm install ${m[1]} --save) and redeploy.`],
+ [/No module named '?([\w.\-]+)/i,m=>`Python package "${m[1]}" is missing — add it to requirements.txt.`],
+ [/EADDRINUSE|address already in use/i,()=>'Port conflict — make your app listen on the PORT environment variable (and host 0.0.0.0).'],
+ [/MongoServerSelectionError|ServerSelectionTimeoutError|ECONNREFUSED.*27017/i,()=>'MongoDB is not reachable — check MONGODB_URI in Variables. On Atlas allow this server IP under Network Access.'],
+ [/Authentication failed|bad auth/i,()=>'MongoDB login failed — wrong username/password in the connection string.'],
+ [/ENOTFOUND/i,()=>'A hostname could not be resolved — check the URL in your variables.'],
+ [/no required module provides|cannot find package|missing go.sum/i,()=>'Go modules missing — run "go mod tidy" locally and push go.mod + go.sum.'],
+ [/OOM|out of memory|Killed/i,()=>'App ran out of memory (limit 512 MB by default). Reduce usage or raise MEM_LIMIT.'],
+ [/permission denied/i,()=>'Permission denied — avoid writing to system folders; write inside the project folder.'],
+ [/NOVA: (.*)/,m=>m[1]],
+ [/npm ERR!/i,()=>'npm failed — see the lines above; often a wrong dependency version or missing package.json "start" script.'],
+ [/SyntaxError/i,()=>'Syntax error in your code — open Files, fix the line shown above, Save & restart.']
+];
+let es=null,logId=null,logMode='live',lines=[],errCount=0,lastHint='',inTb=false;
+function openLogs(p){logId=p.id;$('#lTitle').textContent='Logs — '+p.name;openM('mLogs');logTab('live')}
+function logTab(m){logMode=m;$('#tLive').classList.toggle('on',m==='live');$('#tDep').classList.toggle('on',m==='dep');stopES();clearLogs();
+  if(m==='live'){$('#lBanner').className='banner good';$('#lBanner').textContent='Connecting…';es=new EventSource('/api/projects/'+logId+'/logs/stream');es.onmessage=ev=>addLine(JSON.parse(ev.data));es.onerror=()=>{if(es&&es.readyState===2){$('#lBanner').className='banner bad';$('#lBanner').textContent='Connection lost — sign in again or reopen logs.'}}}
+  else refreshDeploy()}
+async function refreshDeploy(){try{const t=await api('/projects/'+logId+'/deploylog');t.split('\n').forEach(addLine)}catch(e){addLine(e.message)}}
+function stopES(){if(es){es.close();es=null}}
+function closeLogs(){stopES();closeM('mLogs')}
+function clearLogs(){lines=[];errCount=0;lastHint='';inTb=false;$('#lBody').innerHTML='';banner()}
+function addLine(t){
+  let isErr=ERR.test(t);
+  if(/^Traceback \(most recent/.test(t)){inTb=true;isErr=true}else if(inTb){isErr=true;if(t&&!/^\s/.test(t))inTb=false}
+  if(isErr){errCount++;for(const[re,fn]of HINTS){const m=t.match(re);if(m){lastHint=fn(m);break}}}
+  lines.push({t,isErr});if(lines.length>3000)lines.shift();
+  if(!$('#lErrOnly').checked||isErr)appendDom(t,isErr);
+  banner();
+}
+function appendDom(t,isErr){
+  const pre=$('#lBody'),near=pre.scrollHeight-pre.scrollTop-pre.clientHeight<80;
+  const d=document.createElement('div');d.textContent=t;if(isErr)d.className='err';pre.appendChild(d);
+  while(pre.childNodes.length>3000)pre.removeChild(pre.firstChild);
+  if($('#lAuto').checked&&near)pre.scrollTop=pre.scrollHeight;
+}
+function applyFilter(){const pre=$('#lBody');pre.innerHTML='';const only=$('#lErrOnly').checked;lines.forEach(l=>{if(!only||l.isErr)appendDom(l.t,l.isErr)})}
+function banner(){const b=$('#lBanner');
+  if(errCount){b.className='banner bad';b.textContent='⚠ '+errCount+' error line(s) detected'+(lastHint?' — '+lastHint:'')}
+  else{b.className='banner good';b.textContent=lines.length?'✅ No errors — logs are streaming normally':'Waiting for logs…'}}
+
+/* ---------- file editor ---------- */
+let fProj=null,fCur='',fOrig='';
+async function openFiles(p){fProj=p;$('#fDir').value='';fCur='';fOrig='';$('#fTitle').textContent='Files — '+p.name;$('#fPath').value='';$('#fText').value='';$('#fErr').textContent='';openM('mFiles');await listFiles()}
+function dlProjZip(){if(fProj)dlProjectZip(fProj)}
+function dlFile(){if(!fCur){toast('Open a file first',true);return}const b=new Blob([$('#fText').value],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fCur.split('/').pop();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+async function listFiles(){
+  try{const fs=await api('/projects/'+fProj.id+'/files');
+    $('#fList').innerHTML='<div class="d" data-dir="">📦 project root</div>'+(fs.length?fs.map(f=>{const depth=f.path.split('/').length-1,name=f.path.split('/').pop();
+      return f.dir?`<div class="d" data-dir="${esc(f.path)}" style="padding-left:${10+depth*14}px">📂 ${esc(name)}</div>`:`<div data-p="${esc(f.path)}" class="${f.path===fCur?'sel':''}" style="padding-left:${10+depth*14}px">📄 ${esc(name)}</div>`}).join(''):'<div class="d">No files yet — upload a ZIP or use a Git link, or create a file.</div>')}
+  catch(e){$('#fList').innerHTML='<div class="d">'+esc(e.message)+'</div>'}
+}
+$('#fList').addEventListener('click',async e=>{
+  const fd0=e.target.closest('[data-dir]');if(fd0){$('#fDir').value=fd0.dataset.dir;toast('Upload folder: /'+fd0.dataset.dir);return}
+  const d=e.target.closest('[data-p]');if(!d)return;
+  if($('#fText').value!==fOrig&&!await uiConfirm('You have unsaved changes in the editor.',{title:'Discard changes?',ok:'Discard',icon:'alert'}))return;
+  const path=d.dataset.p;$('#fErr').textContent='';
+  try{const t=await api('/projects/'+fProj.id+'/file?path='+encodeURIComponent(path));fCur=path;fOrig=t;$('#fPath').value=path;$('#fText').value=t;listFiles()}catch(x){$('#fErr').textContent=x.message}});
+$('#fText').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart;t.value=t.value.slice(0,s)+'  '+t.value.slice(t.selectionEnd);t.selectionStart=t.selectionEnd=s+2}});
+async function saveFile(restart){
+  const path=$('#fPath').value.trim();if(!path){$('#fErr').textContent='Enter a file path';return}
+  try{await api('/projects/'+fProj.id+'/file?path='+encodeURIComponent(path),{method:'PUT',headers:{'Content-Type':'text/plain'},body:$('#fText').value});
+    fCur=path;fOrig=$('#fText').value;
+    if(restart||autoRun()){await post('/projects/'+fProj.id+'/restart');toast('Saved & deployed ✓')}else toast('Saved ✓ (restart to apply)');
+    $('#fErr').textContent='';listFiles();load()}catch(e){$('#fErr').textContent=e.message}
+}
+/* newFile: see styled dialog below */
+async function delFile(){
+  const path=$('#fPath').value.trim();if(!path||!await uiConfirm('"'+path+'" will be deleted.',{title:'Delete file?',ok:'Delete'}))return;
+  try{await api('/projects/'+fProj.id+'/file?path='+encodeURIComponent(path),{method:'DELETE'});fCur='';fOrig='';$('#fPath').value='';$('#fText').value='';if(autoRun()){await post('/projects/'+fProj.id+'/restart');toast('Deleted & redeployed ✓')}else toast('Deleted');listFiles()}catch(e){$('#fErr').textContent=e.message}
+}
+function dlFile(){
+  const path=$('#fPath').value.trim();if(!path){$('#fErr').textContent='Select or enter a file first';return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('#fText').value],{type:'text/plain'}));
+  a.download=path.split('/').pop();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Downloading '+a.download);
+}
+function dlZip(){location.href='/api/projects/'+fProj.id+'/zip'}
+const autoRun=()=>$('#fAuto').checked&&fProj&&(projects.find(x=>x.id===fProj.id)||{}).status==='running';
+async function closeFiles(){if($('#fText').value!==fOrig&&!await uiConfirm('You have unsaved changes in the editor.',{title:'Discard changes?',ok:'Discard',icon:'alert'}))return;closeM('mFiles')}
+
+['dragenter','dragover'].forEach(ev=>$('#fDrop').addEventListener(ev,e=>{e.preventDefault();$('#fDrop').classList.add('over')}));
+['dragleave','drop'].forEach(ev=>$('#fDrop').addEventListener(ev,e=>{e.preventDefault();$('#fDrop').classList.remove('over')}));
+$('#fDrop').addEventListener('drop',e=>pickFiles(e.dataTransfer.files));
+$('#fDrop').addEventListener('click',()=>$('#fUp').click());
+
+boot();setInterval(()=>{if(me)load()},5000);
+</script>
+<script>
+/* ===== icons (SVG instead of emoji) ===== */
+const ICONS={
+home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+rocket:'<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
+server:'<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
+gem:'<path d="M6 3h12l4 6-10 13L2 9z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+telegram:'<path fill="currentColor" stroke="none" d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/>',
+power:'<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>',
+zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+card:'<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+package:'<line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+play:'<polygon points="5 3 19 12 5 21 5 3"/>',
+stop:'<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+refresh:'<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>',
+filetext:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+file:'<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>',
+download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+shuffle:'<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>',
+eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+eyeoff:'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>',
+globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+cpu:'<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>',
+mail:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+landmark:'<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+bot:'<rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/>',
+check:'<polyline points="20 6 9 17 4 12"/>',
+checkcircle:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+cart:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+menu:'<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+arrowleft:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+heart:'<path fill="currentColor" stroke="none" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>',
+heartbreak:'<path fill="currentColor" stroke="none" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M13.5 4.5l-2.5 4.5 3 2.2-2.2 4.8" stroke="#0a0506" stroke-width="1.7" fill="none"/>'
+};
+function ic(n){return '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||ICONS.zap)+'</svg>'}
+const EMO={'🏠':'home','🚀':'rocket','🗄':'server','🐘':'database','🐬':'database','🟥':'database','🍃':'leaf','💎':'gem','🔑':'key','👤':'user','👥':'users','💬':'telegram','✈':'telegram','⏻':'power','⚡':'zap','✨':'zap','📊':'chart','💳':'card','⚙':'settings','📦':'package','🛠':'wrench','▶':'play','⏹':'stop','↻':'refresh','📜':'filetext','📁':'folder','📂':'folder','📄':'file','⬇':'download','⬆':'upload','📤':'upload','🗑':'trash','＋':'plus','➕':'plus','✎':'pen','🎲':'shuffle','👁':'eye','🌐':'globe','🔗':'link','🔌':'link','🛡':'shield','🧠':'cpu','✉':'mail','🏦':'landmark','📖':'book','🤖':'bot','🎉':'checkcircle','✅':'checkcircle','⚠':'alert','⏳':'clock','🔒':'lock','⭐':'star','🛒':'cart','🟢':'code','🐍':'code','🐹':'code','☕':'code','🦀':'code','🟣':'code','🦕':'code','🐳':'code','💾':'save','☰':'menu','✕':'x','←':'arrowleft','❤':'heart','💔':'heartbreak','🔄':'refresh'};
+const EMO_RE=new RegExp('('+Object.keys(EMO).sort((a,b)=>b.length-a.length).join('|')+')\\uFE0F?');
+function emo(){
+  const tw=document.createTreeWalker(document.body,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(n.nodeType===1){const t=n.nodeName;if(t==='SCRIPT'||t==='STYLE'||t==='TEXTAREA'||t==='SELECT'||t==='svg'||t==='PRE'||(n.classList&&n.classList.contains('ic')))return NodeFilter.FILTER_REJECT;return NodeFilter.FILTER_SKIP}
+    return EMO_RE.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+  const list=[];while(tw.nextNode())list.push(tw.currentNode);
+  list.forEach(n=>{const f=document.createDocumentFragment();
+    n.nodeValue.split(EMO_RE).forEach((p,i)=>{if(i%2===0){if(p)f.appendChild(document.createTextNode(p))}else{const s=document.createElement('span');s.className='ic ic-'+EMO[p];s.innerHTML=ic(EMO[p]);f.appendChild(s)}});
+    n.parentNode.replaceChild(f,n)});
+  document.querySelectorAll('option').forEach(o=>{if(EMO_RE.test(o.textContent))o.textContent=o.textContent.split(EMO_RE).filter((x,i)=>i%2===0).join('').trim()});
+}
+function eyes(){document.querySelectorAll('input[type=password]:not([data-eye])').forEach(i=>{i.dataset.eye=1;const w=document.createElement('div');w.className='pw';if(i.style.flex)w.style.flex=i.style.flex;i.parentNode.insertBefore(w,i);w.appendChild(i);
+  const b=document.createElement('button');b.type='button';b.className='eye';b.title='Show / hide password';b.innerHTML=ic('eye');
+  b.onclick=()=>{const show=i.type==='password';i.type=show?'text':'password';b.innerHTML=ic(show?'eyeoff':'eye')};w.appendChild(b)})}
+function backs(){document.querySelectorAll('.ov > .box:not([data-bk])').forEach(b=>{b.dataset.bk=1;const ov=b.parentElement;if(ov.id==='mAuth'||ov.id==='mGen'||ov.id==='mDlg')return;
+  const btn=document.createElement('button');btn.type='button';btn.className='mback';btn.innerHTML=ic('arrowleft')+' Back';
+  btn.onclick=()=>{if(ov.id==='mLogs')closeLogs();else if(ov.id==='mFiles')closeFiles();else closeM(ov.id)};b.insertBefore(btn,b.firstChild)})}
+function enhance(){emo();eyes();backs()}
+let _pend=false;
+new MutationObserver(()=>{if(_pend)return;_pend=true;requestAnimationFrame(()=>{_pend=false;enhance()})}).observe(document.body,{childList:true,subtree:true,characterData:true});
+enhance();
+
+/* ===== copy (works on http and https) ===== */
+async function copy(t){
+  try{
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(t)}
+    else{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(a);a.focus();a.select();a.setSelectionRange(0,t.length);const ok=document.execCommand('copy');a.remove();if(!ok)throw new Error('x')}
+    toast('Copied ✓');
+  }catch(e){uiPrompt('Copy this',{val:t,ok:'Done',hint:'Select the text and copy it.',icon:'file'})}
+}
+
+/* ===== navigation: back button + sidebar closes on tap ===== */
+function goBack(){location.hash='#/dash'}
+function closeSide(){$('#side').classList.remove('open')}
+document.addEventListener('click',e=>{if(e.target.closest('#side a')||e.target.id==='sideBg')closeSide()});
+function renderView(){
+  if(!me)return;
+  let v=curView();if(!VIEWS[v]||(v.startsWith('a-')&&me.role!=='admin'))v='dash';
+  document.querySelectorAll('.side a[data-v]').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  $('#ptitle').textContent=TITLES[v];$('#backBtn').classList.toggle('hide',v==='dash');
+  Promise.resolve(VIEWS[v]()).catch(e=>{$('#view').innerHTML='<div class="panel err">'+esc(e.message)+'</div>'});
+}
+
+/* ===== plan info / renew / upgrade / storage warning ===== */
+async function planData(){if(window._plans&&Date.now()-(window._plansT||0)<30000)return window._plans;window._plans=await api('/plans');window._plansT=Date.now();return window._plans}
+function warnBar(){
+  if(!me||me.role==='admin'||!me.limits.disk)return '';
+  const pct=me.usage.disk/(me.limits.disk*1024)*100;if(pct<90)return '';
+  const full=pct>=100;
+  return `<div class="warnbar ${full?'full':''}">${ic('alert')}<div><b>${full?'Your account storage is FULL':'Storage almost full ('+Math.round(pct)+'%)'}</b> — ${full?'new uploads and app starts are blocked. ':''}delete files or databases, or <a onclick="location.hash='#/billing'">upgrade your plan</a>.</div></div>`;
+}
+async function viewDash(){
+  const pl=await planData();
+  const L=me.limits,U=me.usage,adm=me.role==='admin',paid=me.plan!=='free'&&!adm;
+  const run=projects.filter(p=>p.status==='running').length,pc=(a,b)=>b?a/b*100:0;
+  const sorted=[...pl.plans].sort((a,b)=>a.price-b.price),cur=sorted.find(p=>p.id===me.plan),next=sorted.find(p=>cur&&p.price>cur.price);
+  const dl=daysLeft(me.planUntil);
+  let actions='';
+  if(adm)actions='<span class="chip">Full VPS</span>';
+  else if(!paid)actions=`<button class="pri" onclick="buyDlg('${(sorted.find(p=>p.price>0)||{}).id}')">${ic('zap')} Upgrade</button>`;
+  else actions=`<button class="pri" onclick="buyDlg('${me.plan}')">${ic('refresh')} Renew plan</button>${next?`<button onclick="buyDlg('${next.id}')">${ic('zap')} Upgrade to ${esc(next.name)}</button>`:`<span class="chip">${ic('star')} Highest plan</span>`}`;
+  $('#view').innerHTML=warnBar()+`<div class="planbar panel"><div><div class="mut">CURRENT PLAN</div><div class="planname">${esc(me.planName)} ${paid?'<span class="tagp">PURCHASED</span>':''}</div>
+   <div class="mut">${paid?'Expires on <b>'+fmtDate(me.planUntil)+'</b> · <b style="color:'+(dl<=3?'var(--bad)':'var(--ok)')+'">'+dl+' day'+(dl==1?'':'s')+' left</b>'+(me.autoRenew?' · auto-renew on':''):adm?'Resources = your whole VPS':'Free plan — upgrade for more RAM, CPU & SSD'}</div></div>
+   <div class="row">${actions}</div></div>
+   <div class="rings">${ring(pc(U.liveRam||0,L.ram),'RAM',fmtMB(Math.round(U.liveRam||0))+' used of '+fmtMB(L.ram))}${ring(pc(U.liveCpu||0,L.cpu),'CPU',Math.round((U.liveCpu||0)*100)+'% used · '+L.cpu+' cores')}${ring(pc(U.disk,L.disk*1024),'SSD',fmtMB(U.disk)+' / '+L.disk+' GB')}</div>
+   <div class="stats3"><div class="sbox"><b>${U.projects}<small> / ${L.projects}</small></b><small>Projects</small></div><div class="sbox"><b style="color:var(--ok)">${run}</b><small>Running now</small></div><div class="sbox"><b>${U.dbs}<small> / ${L.dbs}</small></b><small>Databases</small></div></div>
+   <div class="panel"><h3>Quick start</h3><div class="row"><button class="pri" onclick="location.hash='#/projects';setTimeout(openNew,50)">＋ New project</button><button onclick="location.hash='#/dbs'">🗄 Databases</button><button onclick="location.hash='#/redeem'">🔑 Redeem key</button><a class="chip" style="text-decoration:none" href="${esc(me.support)}" target="_blank" rel="noopener noreferrer">💬 Support channel</a></div></div>`;
+}
+function viewProjects(){
+  const L=me.limits,U=me.usage;
+  $('#view').innerHTML=warnBar()+`<div class="row" style="justify-content:space-between;margin-bottom:14px"><div class="mut">${U.projects}/${L.projects} projects · RAM in use ${fmtMB(Math.round(U.liveRam||0))} of ${fmtMB(L.ram)} · CPU ${Math.round((U.liveCpu||0)*100)}%</div><button class="pri" onclick="openNew()">＋ New project</button></div><div class="grid" id="grid"></div>`;
+  render();
+}
+async function viewBilling(){
+  const [pl,hist]=await Promise.all([planData(),api('/billing/history')]);
+  const adm=me.role==='admin',cp=pl.plans.find(p=>p.id===me.plan),curPrice=adm?Infinity:(cp?cp.price:0);
+  const topId=[...pl.plans].sort((a,b)=>b.price-a.price)[0].id,dl=daysLeft(me.planUntil);
+  const cards=pl.plans.map(p=>{
+    const isCur=!adm&&me.plan===p.id;let btn='';
+    if(p.price>0){
+      if(isCur)btn=`<button class="pri" onclick="buyDlg('${p.id}')">🔄 Renew plan</button>`;
+      else if(p.price>curPrice)btn=`<button class="pri" onclick="buyDlg('${p.id}')">${curPrice>0?'⚡ Upgrade to '+esc(p.name):'🛒 Buy'}</button>`;
+      else if(!adm)btn='<div class="mut" style="font-size:13px">Included in your current plan</div>';
+    }
+    return `<div class="plan ${p.id===topId?'hot':''}">${isCur?'<span class="cur">CURRENT</span>':''}<h3>${esc(p.name)}</h3><div class="price">${p.price?esc(p.price)+' <small>'+esc(pl.currency)+' / month</small>':'Free'}</div>${planList(p)}
+     ${isCur&&p.price>0?`<div class="mut" style="margin-bottom:10px">Expires <b>${fmtDate(me.planUntil)}</b> · <b style="color:${dl<=3?'var(--bad)':'var(--ok)'}">${dl} day${dl==1?'':'s'} left</b></div>`:''}${btn?`<div class="acts">${btn}</div>`:''}</div>`}).join('');
+  $('#view').innerHTML=`<div class="pgrid">${cards}</div>${!pl.stripe&&!pl.manual&&!pl.crypto?'<div class="panel mut">Online payment is not enabled yet — redeem a key from the Stark Host support channel to activate a plan.</div>':''}
+   <div class="panel"><h3>Payment history</h3><div class="tscroll"><table class="tbl"><tr><th>Date</th><th>Plan</th><th>Method</th><th>Txn</th><th>Status</th></tr>${hist.length?hist.map(h=>`<tr><td>${fmtDT(h.created)}</td><td>${esc(h.plan)} × ${h.months}m</td><td>${esc(h.method)}</td><td class="mono">${esc(h.txnId)}</td><td><span class="st ${STAT[h.status]||''}">${esc(h.status)}</span></td></tr>`).join(''):'<tr><td colspan="5" class="mut">Nothing yet.</td></tr>'}</table></div></div>`;
+}
+VIEWS.dash=viewDash;VIEWS.projects=viewProjects;VIEWS.billing=viewBilling;
+
+</script>
+<script>
+/* ===== styled dialogs (replace browser confirm/prompt) ===== */
+ICONS.coin='<circle cx="12" cy="12" r="10"/><path d="M9.5 8h4a2 2 0 0 1 0 4h-4m0 0h4.5a2 2 0 0 1 0 4H9.5M9.5 6v12M12 5v2M12 17v2"/>';
+let _dlgDone=null;
+function _dlgOpen(html,done){$('#mDlgBox').innerHTML=html;$('#mDlg').classList.remove('hide');_dlgDone=done}
+function _dlgClose(v){const f=_dlgDone;_dlgDone=null;$('#mDlg').classList.add('hide');if(f)f(v)}
+$('#mDlg').addEventListener('click',e=>{if(e.target.id==='mDlg')_dlgClose(null)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&_dlgDone)_dlgClose(null)});
+function uiConfirm(msg,o={}){
+  const danger=o.danger!==false;
+  return new Promise(res=>{
+    _dlgOpen(`<div class="dlgic ${danger?'bad':''}">${ic(o.icon||(danger?'trash':'alert'))}</div><h3 class="dlgt">${esc(o.title||'Are you sure?')}</h3><p class="dlgm">${esc(msg)}</p><div class="row dlgb"><button id="dlgNo">Cancel</button><button id="dlgYes" class="${danger?'dngf':'pri'}">${esc(o.ok||'Confirm')}</button></div>`,v=>res(v===true));
+    $('#dlgNo').onclick=()=>_dlgClose(false);$('#dlgYes').onclick=()=>_dlgClose(true);$('#dlgYes').focus();
+  });
+}
+function uiPrompt(title,o={}){
+  return new Promise(res=>{
+    _dlgOpen(`<div class="dlgic">${ic(o.icon||'pen')}</div><h3 class="dlgt">${esc(title)}</h3>${o.hint?`<p class="dlgm" style="margin-bottom:12px">${esc(o.hint)}</p>`:''}<input id="dlgIn" placeholder="${esc(o.ph||'')}" value="${esc(o.val||'')}" autocomplete="off"><div class="row dlgb" style="margin-top:16px"><button id="dlgNo">Cancel</button><button id="dlgYes" class="pri">${esc(o.ok||'OK')}</button></div>`,v=>res(typeof v==='string'&&v.trim()?v.trim():null));
+    const i=$('#dlgIn');i.focus();i.select();
+    i.onkeydown=e=>{if(e.key==='Enter')_dlgClose(i.value)};
+    $('#dlgNo').onclick=()=>_dlgClose(null);$('#dlgYes').onclick=()=>_dlgClose(i.value);
+  });
+}
+async function newFile(){
+  const n=await uiPrompt('Create new file',{ph:'main.py  or  src/config.js',hint:'Any file name works. Folders are created automatically.',ok:'Create',icon:'file',val:($('#fDir').value?$('#fDir').value+'/':'')});
+  if(!n)return;fCur='';fOrig='';$('#fPath').value=n;$('#fText').value='';$('#fText').focus();
+}
+
+/* ===== project cards with LIVE RAM / CPU ===== */
+const barCls=p=>p<60?'g':p<85?'y':'r';
+const miniBar=p=>`<div class="mini"><i class="${barCls(p)}" style="width:${Math.min(100,Math.max(2,p))}%"></i></div>`;
+function render(){
+  const g=$('#grid');if(!g)return;
+  if(!projects.length){g.innerHTML='<div class="empty">No projects yet — tap <b>New project</b> to deploy your first app 🚀</div>';return}
+  g.innerHTML=projects.map(p=>{
+    const on=p.status==='running',wait=p.status==='deploying'||p.status==='restarting',u=projUrl(p);
+    const lang=RTS[p.runtime==='auto'?(p.detected||'auto'):p.runtime]||p.runtime;
+    const ru=p.usedRam||0,rp=p.ram?ru/p.ram*100:0,cp=p.cpu?(p.usedCpu||0)/p.cpu*100:0;
+    return `<div class="card" data-id="${p.id}">
+      <div class="top"><div><div class="name">${esc(p.name)}</div><div class="badge">${esc(lang)}${p.repo?' · 🔗 git':''}</div></div>
+      <div class="pill ${on?'on':wait?'wait':''}"><span class="dot"></span>${esc(p.status)}</div></div>
+      <div class="live"><div><span>RAM</span><b>${on?fmtMB(Math.round(ru)):'—'}</b><small>limit ${fmtMB(p.ram)}</small>${miniBar(on?rp:0)}</div><div><span>CPU</span><b>${on?Math.round(cp)+'%':'—'}</b><small>of its limit</small>${miniBar(on?cp:0)}</div></div>
+      ${u?`<a class="url" href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`:'<span class="url s">domain is being prepared…</span>'}
+      <div class="acts" style="margin-top:10px">
+        ${on?`<button data-a="stop">⏹ Stop</button>`:`<button data-a="start">▶ Start</button>`}
+        <button data-a="restart">↻ Restart</button><button data-a="logs">📜 Logs</button><button data-a="files">📁 Files</button><button data-a="zip">⬇ ZIP</button>
+        <button data-a="cfg">⚙ Settings</button><button class="dng" data-a="del">🗑</button>
+      </div>
+      <div class="drop" data-drop role="button" tabindex="0">⬆ Drop a .zip or file here (or tap) to deploy</div></div>`}).join('');
+}
+
+/* ===== crypto payments ===== */
+function buyDlg(id){const pl=window._plans,p=pl.plans.find(x=>x.id===id);
+  openGen(`<h2>Buy ${esc(p.name)}</h2><p class="mut" style="margin-bottom:12px">${esc(p.price)} ${esc(pl.currency)} / month · choose how to pay</p>
+   ${pl.crypto?`<label class="f">Months (crypto)</label><select id="bm">${[1,2,3,6,12].map(m=>`<option value="${m}">${m} month${m>1?'s':''} — ${(p.price*m).toFixed(2)} ${esc(pl.currency)}</option>`).join('')}</select>`:''}
+   <div class="acts" style="flex-direction:column;margin-top:12px">
+    ${pl.crypto?`<button class="pri" style="width:100%" onclick="buyCrypto('${id}')">${ic('coin')} Pay with crypto (Cryptomus)</button>`:''}
+    ${pl.stripe?`<button class="pri" style="width:100%" onclick="closeM('mGen');buyCard('${id}')">💳 Pay by card — auto-renew every month</button>`:''}
+    ${pl.manual?`<button style="width:100%" onclick="closeM('mGen');manualPay('${id}')">🏦 Pay manually (Easypaisa / JazzCash / bank)</button>`:''}
+    <button style="width:100%" onclick="closeM('mGen');location.hash='#/redeem'">🔑 I already have a key</button>
+    ${!pl.stripe&&!pl.manual&&!pl.crypto?`<a class="chip" style="text-align:center;text-decoration:none;padding:12px" href="${esc(pl.support)}" target="_blank" rel="noopener noreferrer">💬 Contact support to buy</a>`:''}</div>`)}
+async function buyCrypto(id){const m=parseInt(($('#bm')||{}).value||'1',10);try{const r=await post('/billing/crypto',{plan:id,months:m});location.href=r.url}catch(e){toast(e.message,true)}}
+
+/* sidebar: closes only when YOU tap a link or the dark area (never by itself) */
+window.addEventListener('hashchange',closeSide);
+
+</script>
+</body>
+</html>

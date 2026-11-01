@@ -1,0 +1,92 @@
+name: starkhost
+
+services:
+  panel:
+    build: .
+    container_name: stark_panel
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8085:8085"     # local only; the public entrance is Caddy (80/443)
+    environment:
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASS: ${ADMIN_PASS:-}
+      DATA_DIR: /srv/hosting
+      PANEL_CONTAINER: stark_panel
+      PANEL_DOMAIN: ${PANEL_DOMAIN:-}
+      BASE_DOMAIN: ${BASE_DOMAIN:-}
+      PUBLIC_IP: ${PUBLIC_IP:-}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-change-me}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-me}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      MONGO_URI: ${MONGO_URI:-}
+      MONGO_URI_PASSWORD: ${MONGO_URI_PASSWORD:-}
+      ADMIN_DB_MONGO: ${ADMIN_DB_MONGO:-}
+      ADMIN_DB_MONGO_PASSWORD: ${ADMIN_DB_MONGO_PASSWORD:-}
+      ADMIN_DB_POSTGRES: ${ADMIN_DB_POSTGRES:-}
+      ADMIN_DB_MYSQL: ${ADMIN_DB_MYSQL:-}
+      CRYPTOMUS_MERCHANT: ${CRYPTOMUS_MERCHANT:-}
+      CRYPTOMUS_KEY: ${CRYPTOMUS_KEY:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/hosting:/srv/hosting      # must be the SAME path inside and outside
+    networks: [stark]
+
+  caddy:
+    image: caddy:2
+    container_name: stark_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [panel]
+    networks: [stark]
+
+  # ---- built-in databases: start automatically with the panel ----
+  mongo:
+    image: mongo:7
+    container_name: stark_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-change-me}
+    command: ["--wiredTigerCacheSizeGB", "0.5"]
+    volumes:
+      - /srv/hosting/db/mongo:/data/db
+    networks: [stark]
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: stark_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes:
+      - /srv/hosting/db/postgres:/var/lib/postgresql/data
+    networks: [stark]
+
+  mysql:
+    image: mysql:8
+    container_name: stark_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-me}
+    volumes:
+      - /srv/hosting/db/mysql:/var/lib/mysql
+    networks: [stark]
+
+networks:
+  stark:
+    name: stark_net
+
+volumes:
+  caddy_data:
+  caddy_config:
