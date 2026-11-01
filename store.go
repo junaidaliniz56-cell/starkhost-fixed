@@ -349,10 +349,14 @@ func (s *Store) remove(id string) {
 
 func (s *Store) byHost(host string) (Project, bool) {
 	base := baseDomain()
+	ip := publicIP()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, p := range s.D.Projects {
 		if base != "" && host == p.Sub+"."+base {
+			return p, true
+		}
+		if ip != "" && (host == p.Sub+"."+ip+".sslip.io" || host == p.Sub+"."+ip+".nip.io") {
 			return p, true
 		}
 		for _, c := range p.Custom {
