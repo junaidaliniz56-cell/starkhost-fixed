@@ -283,3 +283,14 @@ func handleDomainCheck(w http.ResponseWriter, r *http.Request) {
 	}
 	jsonOut(w, 200, map[string]any{"ok": good, "ips": ips, "expect": want, "error": msg})
 }
+
+func portURL(p Project) string {
+	if !publish {
+		return ""
+	}
+	ip := publicIP()
+	if ip == "" {
+		return ""
+	}
+	return fmt.Sprintf("http://%s:%d", ip, p.Port)
+}

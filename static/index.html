@@ -621,6 +621,7 @@ function render(){
       <div class="top"><div><div class="name">${esc(p.name)}</div><div class="badge">${esc(lang)}${p.repo?' · 🔗 git':''} · ${fmtMB(p.ram)} · ${p.cpu} CPU</div></div>
       <div class="pill ${on?'on':wait?'wait':''}"><span class="dot"></span>${esc(p.status)}</div></div>
       ${u?`<a class="url" href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`:'<span class="url s">domain is being prepared…</span>'}
+      ${p.portUrl?`<a class="url" href="${esc(p.portUrl)}" target="_blank" rel="noopener">🔌 ${esc(p.portUrl)}</a>`:''}
       <div class="acts" style="margin-top:10px">
         ${on?`<button data-a="stop">⏹ Stop</button>`:`<button data-a="start">▶ Start</button>`}
         <button data-a="restart">↻ Restart</button><button data-a="logs">📜 Logs</button><button data-a="files">📁 Files</button><button data-a="zip">⬇ ZIP</button>
@@ -677,7 +678,7 @@ function fillProj(p){
   $('#rHint').textContent='These are the MAXIMUM limits of this project — live usage is on the project card. Your plan: '+fmtMB(me.limits.ram)+' RAM and '+me.limits.cpu+' CPU in total, shared by all your projects.';
   const sch=location.protocol==='https:'?'https':'http';
   $('#dGen').textContent=p.host||'(waiting for server IP detection…)';
-  $('#dGenH').textContent=p.host?'Works instantly, no DNS setup needed. '+sch+'://'+p.host:'';
+  $('#dGenH').textContent=(p.host?'Domain: '+sch+'://'+p.host:'')+(p.portUrl?'   ·   Direct port: '+p.portUrl:'');
   const tgt=(me.ip||'<server-ip>');
   $('#dHelp').innerHTML='Add a DNS record at your domain provider: <b>A</b> record → your server IP, or <b>CNAME</b> → <code>'+esc(p.host||'your generated domain')+'</code>. HTTPS certificate is issued automatically.';
   $('#dLock').classList.toggle('hide',!!me.limits.custom);$('#dNew').disabled=!me.limits.custom;
@@ -1208,6 +1209,7 @@ function render(){
       <div class="pill ${on?'on':wait?'wait':''}"><span class="dot"></span>${esc(p.status)}</div></div>
       <div class="live"><div><span>RAM</span><b>${on?fmtMB(Math.round(ru)):'—'}</b><small>limit ${fmtMB(p.ram)}</small>${miniBar(on?rp:0)}</div><div><span>CPU</span><b>${on?Math.round(cp)+'%':'—'}</b><small>of its limit</small>${miniBar(on?cp:0)}</div></div>
       ${u?`<a class="url" href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`:'<span class="url s">domain is being prepared…</span>'}
+      ${p.portUrl?`<a class="url" href="${esc(p.portUrl)}" target="_blank" rel="noopener">🔌 ${esc(p.portUrl)}</a>`:''}
       <div class="acts" style="margin-top:10px">
         ${on?`<button data-a="stop">⏹ Stop</button>`:`<button data-a="start">▶ Start</button>`}
         <button data-a="restart">↻ Restart</button><button data-a="logs">📜 Logs</button><button data-a="files">📁 Files</button><button data-a="zip">⬇ ZIP</button>

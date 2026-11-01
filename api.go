@@ -39,6 +39,7 @@ type ProjectView struct {
 	Env      map[string]string `json:"env"`
 	Sub      string            `json:"sub"`
 	Host     string            `json:"host"`
+	PortURL  string            `json:"portUrl"`
 	Custom   []string          `json:"custom"`
 	Status   string            `json:"status"`
 	UsedRAM  float64           `json:"usedRam"`
@@ -65,7 +66,7 @@ func view(p Project) ProjectView {
 	us := statsOf(cname(p))
 	return ProjectView{UsedRAM: us.MemMB, UsedCPU: us.CPU / 100, ID: p.ID, Owner: owner, Name: p.Name, Runtime: p.Runtime, Detected: p.Detected, Cmd: p.Cmd, Port: p.Port,
 		RAM: p.RAM, CPU: p.CPU, Created: p.Created, Repo: p.Repo, Branch: p.Branch, HasToken: p.Token != "", Hook: hook, Env: e,
-		Sub: p.Sub, Host: hostOf(p), Custom: c, Status: status(p)}
+		Sub: p.Sub, Host: hostOf(p), PortURL: portURL(p), Custom: c, Status: status(p)}
 }
 
 // every project handler goes through here: owners see their own projects, admin sees all
